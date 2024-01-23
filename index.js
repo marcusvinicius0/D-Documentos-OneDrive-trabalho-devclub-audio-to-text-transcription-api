@@ -5,14 +5,13 @@ class App {
   constructor() {
     this.app = express();
     this.app.use((req, res, next) => {
-      const origin = 'https://devclub-audiotranscription.netlify.app/';
       res.header(
         'Access-Control-Allow-Methods',
         'POST, GET, PUT, PATCH, OPTIONS, DELETE',
       );
       res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
       res.header('Acces-Control-Allow-Credentials', true);
-      res.header('Access-Control-Allow-Origin', origin);
+      res.header('Access-Control-Allow-Origin', 'https://devclub-audiotranscription.netlify.app/');
       next();
     });
     this.app.use(express.urlencoded({ extended: true, limit: '3mb' }));
