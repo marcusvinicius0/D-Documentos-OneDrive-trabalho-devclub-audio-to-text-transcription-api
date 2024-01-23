@@ -5,22 +5,14 @@ class App {
   constructor() {
     this.app = express();
     this.app.use((req, res, next) => {
-      const allowedOrigins = [
-        'http://localhost:8080',
-        'http://localhost:3001',
-        'http://127.0.0.1:5500',
-        'https://devclub-audiotranscription.netlify.app',
-      ];
-      const origin = req.headers.origin;
-      if (allowedOrigins.includes(origin)) {
-        res.setHeader('Access-Control-Allow-Origin', origin);
-      }
+      const origin = 'https://devclub-audiotranscription.netlify.app';
       res.header(
         'Access-Control-Allow-Methods',
         'POST, GET, PUT, PATCH, OPTIONS, DELETE',
       );
       res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
       res.header('Acces-Control-Allow-Credentials', true);
+      res.header('Access-Control-Allow-Origin', origin);
       next();
     });
     this.app.use(express.urlencoded({ extended: true, limit: '3mb' }));
