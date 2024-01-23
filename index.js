@@ -5,7 +5,7 @@ class App {
   constructor() {
     this.app = express();
     this.app.use((req, res, next) => {
-      const origin = 'https://devclub-audiotranscription.netlify.app';
+      const origin = 'https://devclub-audiotranscription.netlify.app/';
       res.header(
         'Access-Control-Allow-Methods',
         'POST, GET, PUT, PATCH, OPTIONS, DELETE',
