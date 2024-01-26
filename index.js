@@ -5,7 +5,7 @@ class App {
   constructor() {
     this.app = express();
     this.app.use((req, res, next) => {
-      const allowedOrigins = ['https://devclub-audiotranscription.netlify.app', 'http://localhost:3000'];
+      const allowedOrigins = ['https://devclub-audiotranscription.netlify.app', 'http://localhost:3000', 'http://127.0.0.1:5500', 'http://localhost:3001'];
       const origin = req.headers.origin;
       if (allowedOrigins.includes(origin)) {
          res.setHeader('Access-Control-Allow-Origin', origin);
@@ -16,14 +16,12 @@ class App {
       );
       res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
       res.header('Acces-Control-Allow-Credentials', true);
-      res.header('Access-Control-Allow-Origin', 'https://devclub-audiotranscription.netlify.app');
       next();
     });
     this.app.use(express.urlencoded({ extended: true, limit: '3mb' }));
 
     this.middlewares();
     this.routes();
-    // this.app.use(errorHandler);
   }
 
   middlewares() {

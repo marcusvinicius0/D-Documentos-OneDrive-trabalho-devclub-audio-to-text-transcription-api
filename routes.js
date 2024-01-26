@@ -2,6 +2,7 @@ import { Router } from "express";
 import multer from "multer";
 import path from "path";
 import { speechToText } from "./speech-to-text.js";
+import { PostUpdatedTranscriptionTextController } from "./controller/PostUpdatedTranscriptionTextController.js";
 
 const routes = new Router();
 
@@ -52,5 +53,11 @@ routes.post("/get-mp3-file", upload.single("audio"), async (req, res) => {
     });
   }
 });
+
+routes.post("/post-updated-text", new PostUpdatedTranscriptionTextController().store);
+
+routes.get("/get-user", async function (req, res) {
+  return res.json({ message: "API is running" });
+})
 
 export default routes;
