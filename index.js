@@ -5,7 +5,7 @@ class App {
   constructor() {
     this.app = express();
     this.app.use((req, res, next) => {
-      const allowedOrigins = ['https://chatbotdevclub.netlify.app/', 'http://localhost:3000', 'http://127.0.0.1:5500', 'http://localhost:3001'];
+      const allowedOrigins = ['https://chatbotdevclub.netlify.app', 'http://localhost:3000', 'http://127.0.0.1:5500', 'http://localhost:3001', ''];
       const origin = req.headers.origin;
       if (allowedOrigins.includes(origin)) {
          res.setHeader('Access-Control-Allow-Origin', origin);
