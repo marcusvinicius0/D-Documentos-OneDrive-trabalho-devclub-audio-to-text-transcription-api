@@ -1,7 +1,7 @@
 import { Router } from "express";
 import multer from "multer";
 import path from "path";
-import { speechToText } from "../speech-to-text.js";
+import { speechToText } from "./edenai/speech-to-text.js";
 import { SaveTrancribedTexts } from "./controllers/chatbase/SaveTranscribedTextsController.js";
 import { GetTranscribedTexts } from "./controllers/chatbase/GetTranscribedTextsController.js";
 
