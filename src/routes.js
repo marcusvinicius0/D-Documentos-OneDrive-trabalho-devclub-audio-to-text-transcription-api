@@ -1,8 +1,9 @@
 import { Router } from "express";
 import multer from "multer";
 import path from "path";
-import { speechToText } from "./speech-to-text.js";
-import { PostUpdatedTranscriptionTextController } from "./controller/PostUpdatedTranscriptionTextController.js";
+import { speechToText } from "../speech-to-text.js";
+import { SaveTrancribedTexts } from "./controllers/chatbase/SaveTranscribedTextsController.js";
+import { GetTranscribedTexts } from "./controllers/chatbase/GetTranscribedTextsController.js";
 
 const routes = new Router();
 
@@ -30,13 +31,12 @@ routes.get("/", async (req, res, next) => {
   }
 });
 
-routes.post("/get-mp3-file", upload.single("audio"), async (req, res) => {
+routes.post("/mp3file", upload.single("audio"), async (req, res) => {
   if (!req.file) {
     return res.status(400).send("Nenhum arquivo foi enviado.");
   }
 
   try {
-    console.log("Arquivo recebido:", req.file.path);
     const filePath = req.file.path;
     const result = await speechToText(filePath);
 
@@ -54,10 +54,7 @@ routes.post("/get-mp3-file", upload.single("audio"), async (req, res) => {
   }
 });
 
-routes.post("/post-updated-text", new PostUpdatedTranscriptionTextController().store);
-
-routes.get("/get-user", async function (req, res) {
-  return res.json({ message: "API is running" });
-})
+routes.post("/transcribed-text", new SaveTrancribedTexts().store);
+routes.get("/transcribed-text/:id", new GetTranscribedTexts().index);
 
 export default routes;

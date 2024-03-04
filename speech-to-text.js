@@ -2,7 +2,6 @@ import axios from "axios";
 import fs from "fs";
 import "dotenv/config";
 
-// const FormData = require("form-data");
 import FormData from "form-data";
 
 export const speechToText = async (file) => {
@@ -26,8 +25,6 @@ export const speechToText = async (file) => {
   const res = axios
     .request(options)
     .then((response) => {
-      console.log(response.data);
-
       return response.data;
     })
     .catch((error) => {
