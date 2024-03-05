@@ -7,6 +7,7 @@ class GetTranscribedTextsService {
       await prismaClient.transcribedMessagesTable.findMany({
         where: {
           author: userSession,
+          isFiled: false,
         },
       });
 
