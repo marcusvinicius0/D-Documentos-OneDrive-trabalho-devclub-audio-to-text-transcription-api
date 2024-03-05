@@ -25,8 +25,8 @@ CREATE TABLE "chat-session" (
 CREATE TABLE "chatbot-messages" (
     "id" TEXT NOT NULL,
     "chatSessionId" TEXT NOT NULL,
-    "sender" JSONB[],
-    "bot" JSONB[],
+    "sender" JSONB NOT NULL,
+    "bot" JSONB NOT NULL,
     "isFiled" BOOLEAN NOT NULL DEFAULT false,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
@@ -36,9 +36,6 @@ CREATE TABLE "chatbot-messages" (
 
 -- CreateIndex
 CREATE UNIQUE INDEX "transcribed-messages_id_key" ON "transcribed-messages"("id");
-
--- CreateIndex
-CREATE UNIQUE INDEX "transcribed-messages_author_key" ON "transcribed-messages"("author");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "chat-session_id_key" ON "chat-session"("id");
