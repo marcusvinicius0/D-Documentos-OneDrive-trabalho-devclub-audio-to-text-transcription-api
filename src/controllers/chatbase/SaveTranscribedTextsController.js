@@ -1,6 +1,6 @@
 import { createSaveTranscribedTextsService } from "../../utils/services.js";
 
-class SaveTrancribedTexts {
+class SaveTrancribedTextsController {
   async store(req, res, next) {
     try {
       const { messageTranscribed } = req.body;
@@ -19,4 +19,4 @@ class SaveTrancribedTexts {
   }
 }
 
-export { SaveTrancribedTexts };
+export { SaveTrancribedTextsController };
