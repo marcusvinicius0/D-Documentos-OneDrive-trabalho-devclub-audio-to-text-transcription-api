@@ -16,7 +16,7 @@ datasource db {
 model TranscribedMessagesTable {
   id      String  @id @unique @default(uuid())
   message String
-  author  String  @unique
+  author  String  
   isFiled Boolean @default(false)
 
   createdAt DateTime @default(now())
@@ -40,8 +40,8 @@ model ChatSession {
 model ChatbotMessages {
   id            String      @id @unique @default(uuid())
   chatSessionId String
-  sender        Json[]
-  bot           Json[]
+  sender        Json
+  bot           Json
   isFiled       Boolean     @default(false)
   ChatSession   ChatSession @relation(fields: [chatSessionId], references: [id])
 
