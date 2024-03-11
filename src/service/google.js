@@ -29,6 +29,7 @@ export const getOrCreateChatSession = (chatId) => {
       parts: "Olá, certo!",
     },
   ];
+  
   activeChats.set(chatId, history);
   return model.startChat({
     history,
@@ -41,6 +42,8 @@ export const mainGoogle = async ({ currentUserMessage, chatId }) => {
   const result = await chat.sendMessage(prompt);
   const response = await result.response;
   const text = response.text();
+
+  console.log(text);
 
   activeChats.set(chatId, [
     ...activeChats.get(chatId),

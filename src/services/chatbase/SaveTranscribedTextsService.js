@@ -15,6 +15,8 @@ class SaveTranscribedTextsService {
         message: messageTranscribed.message,
         author: messageTranscribed.author,
         isFiled: messageTranscribed.isFiled,
+        fileName: messageTranscribed.fileName,
+        messageLength: messageTranscribed.messageLength,
       },
     });
 

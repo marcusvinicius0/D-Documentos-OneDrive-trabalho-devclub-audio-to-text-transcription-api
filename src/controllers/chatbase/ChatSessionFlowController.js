@@ -1,4 +1,5 @@
 import { mainGoogle } from "../../service/google.js";
+import { initializeNewAIChatSession, mainOpenAI } from "../../service/openai.js";
 
 class ChatSessionFlowController {
   async store(req, res, next) {
@@ -8,9 +9,11 @@ class ChatSessionFlowController {
       const currentUserMessage = body.message;
       const chatId = userSession;
 
-      const AIServiceRes = await mainGoogle({ currentUserMessage, chatId });
+      // const AIServiceRes = await mainGoogle({ currentUserMessage, chatId });
+      await initializeNewAIChatSession(chatId);
+      const AIService = await mainOpenAI({ currentMessage: currentUserMessage, chatId });
 
-      return res.status(200).json(AIServiceRes);
+      return res.status(200).json(AIService);
     } catch (error) {
       next(error);
     }
