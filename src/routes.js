@@ -10,6 +10,7 @@ import { ChatSessionFlowController } from "./controllers/chatbase/ChatSessionFlo
 import { SaveChatFlowController } from "./controllers/chatbase/SaveChatFlowController.js";
 import { GetChatHistoryController } from "./controllers/chatbase/GetChatHistoryController.js";
 import { GetFiledTranscribedTextsController } from "./controllers/chatbase/GetFiledTranscribedTextsController.js";
+import { StartNewConnectSessionController } from "./controllers/wpp/StartNewConnectSessionController.js";
 
 const routes = new Router();
 
@@ -68,5 +69,6 @@ routes.post("/chat-session/:id", new ChatSessionFlowController().store);
 routes.post("/save-chatflow", new SaveChatFlowController().store);
 
 routes.get("/chat-history/:id", new GetChatHistoryController().index);
+routes.post("/wppconnection/:id", new StartNewConnectSessionController().store);
 
 export default routes;

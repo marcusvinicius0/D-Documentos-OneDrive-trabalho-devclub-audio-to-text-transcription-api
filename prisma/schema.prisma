@@ -18,6 +18,8 @@ model TranscribedMessagesTable {
   message String
   author  String  
   isFiled Boolean @default(false)
+  fileName String @default("")
+  messageLength Int @default(0)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
