@@ -21,11 +21,11 @@ export async function startNewWppConnectSession(onQRCode) {
         console.log("Status session: ", statusSession);
         console.log("Session name: ", session);
       },
-      headless: "new",
+      headless: false,
     })
     .then((client) => {
-      io.emit("wppsession", ["Connected to wpp."]);
       start(client);
+      io.emit("wppsession", "Connected to wpp.");
     })
     .catch((error) => {
       console.error(error);
@@ -36,7 +36,6 @@ export async function startNewWppConnectSession(onQRCode) {
 async function start(client) {
   client.onMessage((message) => {
     (async () => {
-      io.emit("wppsession", "Connected to wpp.");
       if (message.type === "chat" && !message.isGroupMsg) {
         const chatId = message.chatId;
         console.log("Mensagem recebida:", message.body);
@@ -72,13 +71,13 @@ async function start(client) {
 
               console.log("Enviando mensagens...");
               client
-              .sendText(message.from, answer)
-              .then((result) => {
-                console.log("Mensagem enviada:", result.body);
-              })
-              .catch((error) => {
-                console.error("Erro ao enviar mensagem:", error);
-              });
+                .sendText(message.from, answer)
+                .then((result) => {
+                  console.log("Mensagem enviada:", result.body);
+                })
+                .catch((error) => {
+                  console.error("Erro ao enviar mensagem:", error);
+                });
               messageBufferPerChatId.delete(chatId);
               messageTimeouts.delete(chatId);
             })();
