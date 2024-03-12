@@ -1,8 +1,8 @@
-import prismaClient from "../../prisma/connect.js";
-import { AppError } from "../../errors/app.error.js";
+import prismaClient from "../../../prisma/connect.js";
+import { AppError } from "../../../errors/app.error.js";
 
 import fs from "node:fs";
-import { getOrCreateChatSession } from "../../service/google.js";
+import { getOrCreateChatSession } from "../../../service/google.js";
 
 class TrainChatbotService {
   async execute({ userSession }) {
@@ -21,8 +21,16 @@ class TrainChatbotService {
       throw new AppError("Nenhum texto para treinamento foi encontrado.", 404);
     }
 
-    const textsForTraining = isTextsForTraining.map((text) => text.message).join("\n");
-    fs.writeFileSync("./src/utils/chatbot-content.js", JSON.stringify(textsForTraining, null, 2), { encoding: "utf-8" });
+    let existingContent = "";
+    if (fs.existsSync("./src/utils/chatbot-content.js")) {
+      existingContent = fs.readFileSync("./src/utils/chatbot-content.js", { encoding: "utf-8" });
+    }
+
+    const newTexts = isTextsForTraining.map((text) => text.message).join("\n");
+
+    const updatedContent = existingContent + newTexts;
+
+    fs.writeFileSync("./src/utils/chatbot-content.js", JSON.stringify(updatedContent, null, 2), { encoding: "utf-8" });
 
     const chatId = userSession;
     getOrCreateChatSession(chatId);

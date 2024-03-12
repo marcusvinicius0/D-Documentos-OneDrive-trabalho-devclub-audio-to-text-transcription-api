@@ -1,5 +1,5 @@
-import { AppError } from "../../errors/app.error.js";
-import prismaClient from "../../prisma/connect.js";
+import { AppError } from "../../../errors/app.error.js";
+import prismaClient from "../../../prisma/connect.js";
 
 class SaveTranscribedTextsService {
   async execute({ messageTranscribed }) {
@@ -15,6 +15,8 @@ class SaveTranscribedTextsService {
         message: messageTranscribed.message,
         author: messageTranscribed.author,
         isFiled: messageTranscribed.isFiled,
+        fileName: messageTranscribed.fileName,
+        messageLength: messageTranscribed.messageLength,
       },
     });
 

@@ -29,6 +29,7 @@ export const getOrCreateChatSession = (chatId) => {
       parts: "Olá, certo!",
     },
   ];
+  
   activeChats.set(chatId, history);
   return model.startChat({
     history,
