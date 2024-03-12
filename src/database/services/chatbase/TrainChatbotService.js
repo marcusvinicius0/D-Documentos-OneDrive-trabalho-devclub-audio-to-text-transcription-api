@@ -1,8 +1,9 @@
-import prismaClient from "../../prisma/connect.js";
-import { AppError } from "../../errors/app.error.js";
+import prismaClient from "../../../prisma/connect.js";
+import { AppError } from "../../../errors/app.error.js";
 
 import fs from "node:fs";
-import { getOrCreateChatSession } from "../../service/google.js";
+import { getOrCreateChatSession } from "../../../service/google.js";
+
 class TrainChatbotService {
   async execute({ userSession }) {
     const isTextsForTraining =

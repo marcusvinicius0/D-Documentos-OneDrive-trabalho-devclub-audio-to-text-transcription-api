@@ -1,5 +1,5 @@
-import { AppError } from "../../errors/app.error.js";
-import prismaClient from "../../prisma/connect.js";
+import { AppError } from "../../../errors/app.error.js";
+import prismaClient from "../../../prisma/connect.js";
 
 class GetTranscribedTextsService {
   async execute({ userSession }) {

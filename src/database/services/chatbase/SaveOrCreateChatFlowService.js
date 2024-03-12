@@ -1,4 +1,4 @@
-import prismaClient from "../../prisma/connect.js";
+import prismaClient from "../../../prisma/connect.js";
 
 class SaveOrCreateChatFlowService {
   async execute({ latestMessages }) {
