@@ -43,8 +43,6 @@ export const mainGoogle = async ({ currentUserMessage, chatId }) => {
   const response = await result.response;
   const text = response.text();
 
-  console.log(text);
-
   activeChats.set(chatId, [
     ...activeChats.get(chatId),
     {

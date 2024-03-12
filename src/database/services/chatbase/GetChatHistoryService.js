@@ -1,5 +1,4 @@
-import { AppError } from "../../errors/app.error.js";
-import prismaClient from "../../prisma/connect.js";
+import prismaClient from "../../../prisma/connect.js";
 
 class GetChatHistoryService {
   async execute({ userSession }) {
@@ -10,7 +9,7 @@ class GetChatHistoryService {
     })
 
     if (!findUserChatSession) {
-      throw new AppError("Não foi possível encontrar uma sessão de chat ativa para esse usuário.", 404);
+      return [];
     }
 
     const session_id = findUserChatSession.id;
