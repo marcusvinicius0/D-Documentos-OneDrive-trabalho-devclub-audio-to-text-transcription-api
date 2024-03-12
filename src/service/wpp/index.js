@@ -1,6 +1,4 @@
 import wppconnect from "@wppconnect-team/wppconnect";
-import { mainGoogle } from "../google.js";
-import { sendMessagesWithDelay, splitMessages } from "../../utils/index.js";
 
 const messageBufferPerChatId = new Map();
 const messageTimeouts = new Map();

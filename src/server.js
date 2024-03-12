@@ -13,8 +13,9 @@ class App {
     this.io = new SocketIOServer(this.httpServer, {
       cors: {
         origin: ["https://chatbotdevclub.netlify.app", "http://localhost:3000", "http://127.0.0.1:5500", "http://localhost:3001"],
-        methods: ["GET", "POST"],
+        methods: ["GET", "POST", "PUT"],
         credentials: true,
+        allowedHeaders: "*",
       }
     })
 
