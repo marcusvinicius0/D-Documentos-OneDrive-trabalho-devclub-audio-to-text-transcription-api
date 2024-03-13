@@ -6,9 +6,3 @@ if (process.env.NODE_ENV !== "production") {
 }
 
 export default prismaClient;
-
-// import { PrismaClient } from '@prisma/client';
-
-// const prismaClient = new PrismaClient();
-
-// export default prismaClient;
