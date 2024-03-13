@@ -11,15 +11,10 @@ class App {
     this.httpServer = createServer(this.app);
     this.io = new SocketIOServer(this.httpServer, {
       cors: {
-        origin: [
-          "https://chatbotdevclub.netlify.app",
-          "http://localhost:3000",
-          "http://127.0.0.1:5500",
-          "http://localhost:3001",
-        ],
-        methods: ["GET", "POST", "PUT"],
-        credentials: true,
+        origin: "*",
+        exposedHeaders: "*",
         allowedHeaders: "*",
+        methods: ["GET", "POST", "PUT"],
       },
     });
     this.configureSocket();
@@ -45,7 +40,7 @@ class App {
         "POST, GET, PUT, PATCH, OPTIONS, DELETE"
       );
       res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
-      res.header("Acces-Control-Allow-Credentials", true);
+      res.header("Access-Control-Allow-Credentials", true);
       next();
     });
     this.app.use(express.urlencoded({ extended: true, limit: "3mb" }));
