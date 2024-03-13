@@ -18,10 +18,14 @@ export async function startNewWppConnectSession(onQRCode) {
         console.log("Status session: ", statusSession);
         console.log("Session name: ", session);
       },
-      headless: false,
-    })
+      headless: true, 
+      puppeteerOptions: {
+        args: ['--no-sandbox', '--headless', '--disable-gpu'],
+      }
+    }) 
     .then((client) => {
       start(client);
+      console.log("started wpp connect", client);
       io.emit("wppsession", "Connected to wpp.");
     })
     .catch((error) => {
