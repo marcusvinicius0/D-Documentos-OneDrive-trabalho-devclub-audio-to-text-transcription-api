@@ -4,18 +4,14 @@ import routes from "./routes.js";
 import "dotenv/config";
 import { errorHandler } from "./middlewares/error-handler.middleware.js";
 import { Server as SocketIOServer } from "socket.io";
+import cors from "cors";
 
 class App {
   constructor() {
     this.app = express();
     this.httpServer = createServer(this.app);
     this.io = new SocketIOServer(this.httpServer, {
-      cors: {
-        origin: "*",
-        exposedHeaders: "*",
-        allowedHeaders: "*",
-        methods: ["GET", "POST", "PUT"],
-      },
+      cors: {},
     });
     this.configureSocket();
     this.configureApp();
@@ -24,25 +20,16 @@ class App {
   }
 
   configureApp() {
-    this.app.use((req, res, next) => {
-      const allowedOrigins = [
+    this.app.use(cors({
+      origin: [
         "https://chatbotdevclub.netlify.app",
         "http://localhost:3000",
         "http://127.0.0.1:5500",
         "http://localhost:3001",
-      ];
-      const origin = req.headers.origin;
-      if (allowedOrigins.includes(origin)) {
-        res.setHeader("Access-Control-Allow-Origin", origin);
-      }
-      res.header(
-        "Access-Control-Allow-Methods",
-        "POST, GET, PUT, PATCH, OPTIONS, DELETE"
-      );
-      res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
-      res.header("Access-Control-Allow-Credentials", true);
-      next();
-    });
+      ],
+      methods: ["GET", "POST", "PUT", "PATCH", "OPTIONS", "DELETE"],
+      allowedHeaders: "*",
+    }));
     this.app.use(express.urlencoded({ extended: true, limit: "3mb" }));
   }
 

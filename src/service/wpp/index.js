@@ -11,10 +11,7 @@ export async function startNewWppConnectSession(onQRCode) {
     .create({
       session: "sessioName",
       catchQR: (base64Qrimg, asciiQR, attempts, urlCode) => {
-        console.log("base64QRimg: ", base64Qrimg);
-        console.log("asciiQR: ", asciiQR);
-        console.log("attemps: ", attempts);
-        console.log("urlCode: ", urlCode);
+        console.log("terminal qrcode: ", asciiQR);
         onQRCode({ base64Qrimg, asciiQR, attempts, urlCode });
       },
       statusFind: (statusSession, session) => {
@@ -36,7 +33,11 @@ export async function startNewWppConnectSession(onQRCode) {
 async function start(client) {
   client.onMessage((message) => {
     (async () => {
-      if (message.type === "chat" && !message.isGroupMsg) {
+      if (
+        message.type === "chat" &&
+        !message.isGroupMsg &&
+        message.chatId !== "status@broadcast"
+      ) {
         const chatId = message.chatId;
         console.log("Mensagem recebida:", message.body);
         await initializeNewAIChatSession(chatId);
