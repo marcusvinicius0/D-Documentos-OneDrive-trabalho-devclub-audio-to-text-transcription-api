@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -13,18 +7,70 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model TranscribedMessagesTable {
-  id      String  @id @unique @default(uuid())
-  message String
-  author  String  
-  isFiled Boolean @default(false)
-  fileName String @default("")
-  messageLength Int @default(0)
+enum ChatbotStatus {
+  Treinado
+  Desativado
+}
+
+enum ChatbotVisibility {
+  Publico
+  Privado
+}
+
+model Chatbot {
+  id            String            @id @unique @default(uuid())
+  name          String            @default("Chatbot")
+  status        ChatbotStatus     @default(Treinado)
+  visibility    ChatbotVisibility @default(Publico)
+  lastTrainedAt DateTime          @updatedAt
+  model         String            @default("")
+  imageUrl      String?           @default("")
+  authorEmail   String            @default("")
+  authorName    String
+  slug          String            @unique @default("")
+
+  Files       FilesForBotTraining[]
+  Texts       TextsForBotTraining[]
+  ChatSession ChatSession[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  @@map("transcribed-messages")
+  @@map("user-chatbot")
+}
+
+model FilesForBotTraining {
+  id            String   @id @unique @default(uuid())
+  message       String
+  author        String
+  fileName      String   @default("")
+  messageLength Int      @default(0)
+  lastModified  DateTime @default(now())
+  isFileTrained Boolean  @default(false)
+  chatbotId     String
+  Chatbot       Chatbot  @relation(fields: [chatbotId], references: [id])
+  slug          String   @default("")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("files-for-bot-training")
+}
+
+model TextsForBotTraining {
+  id            String  @id @unique @default(uuid())
+  text          String
+  author        String
+  isTextTrained Boolean @default(false)
+  textLength    Int     @default(0)
+  chatbotId     String
+  Chatbot       Chatbot @relation(fields: [chatbotId], references: [id])
+  slug          String  @default("")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("texts-for-bot-training")
 }
 
 model ChatSession {
@@ -32,9 +78,13 @@ model ChatSession {
   userId  String  @unique
   isFiled Boolean @default(false)
 
-  createdAt       DateTime          @default(now())
-  updatedAt       DateTime          @updatedAt
+  chatbotId       String            @default("")
+  Chatbot         Chatbot           @relation(fields: [chatbotId], references: [id])
   ChatbotMessages ChatbotMessages[]
+  slug            String            @default("")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@map("chat-session")
 }

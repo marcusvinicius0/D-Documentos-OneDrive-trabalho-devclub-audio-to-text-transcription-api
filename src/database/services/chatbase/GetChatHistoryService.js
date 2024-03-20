@@ -1,10 +1,10 @@
 import prismaClient from "../../../prisma/connect.js";
 
 class GetChatHistoryService {
-  async execute({ userSession }) {
+  async execute({ slug }) {
     const findUserChatSession = await prismaClient.chatSession.findFirst({
       where: {
-        userId: userSession,
+        slug: slug,
       }
     })
 

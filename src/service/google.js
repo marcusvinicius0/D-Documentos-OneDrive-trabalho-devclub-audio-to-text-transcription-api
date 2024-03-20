@@ -40,7 +40,7 @@ export const mainGoogle = async ({ currentUserMessage, chatId }) => {
   const chat = getOrCreateChatSession(chatId);
   const prompt = currentUserMessage;
   const result = await chat.sendMessage(prompt);
-  const response = await result.response;
+  const response = result.response;
   const text = response.text();
 
   activeChats.set(chatId, [

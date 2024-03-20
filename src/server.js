@@ -1,10 +1,12 @@
-import express from "express";
 import { createServer } from "node:http";
-import routes from "./routes.js";
-import "dotenv/config";
-import { errorHandler } from "./middlewares/error-handler.middleware.js";
 import { Server as SocketIOServer } from "socket.io";
+import express from "express";
+import "dotenv/config";
+
 import cors from "cors";
+import routes from "./routes.js";
+import { errorHandler } from "./middlewares/error-handler.middleware.js";
+
 
 class App {
   constructor() {
@@ -50,12 +52,6 @@ class App {
       socket.on("disconnect", () => {
         console.log("Usuário desconectou", socket.id);
       });
-
-      socket.emit("connectedToServer", `Conectado com servidor, ${socket.id}`);
-    });
-    this.io.on("connection", (socket) => {
-      console.log("Um usuário conectou", socket.id);
-      io.emit("test", "Conexão Socket.io estabelecida.");
     });
   }
 }
