@@ -9,6 +9,7 @@ import { SaveNewChatbotService } from "../database/services/chatbase/SaveNewChat
 import { SaveOrCreateChatFlowService } from "../database/services/chatbase/SaveOrCreateChatFlowService.js";
 import { SaveTextsForTrainingService } from "../database/services/chatbase/SaveTextsForTrainingService.js";
 import { TrainChatbotService } from "../database/services/chatbase/TrainChatbotService.js";
+import { CheckOrCreateUserService } from "../database/services/user/CheckOrCreateUserService.js";
 
 export const createTrainChatbotService = new TrainChatbotService();
 
@@ -23,3 +24,5 @@ export const createGetChatbotsService = new GetChatbotsService();
 export const createGetUniqueChatbotService = new GetUniqueChatbotService();
 export const createGetTrainedFilesService = new GetTrainedFilesService();
 export const createGetTrainedTextsService = new GetTrainedTextsService();
+
+export const createCheckOrCreateUserService = new CheckOrCreateUserService();

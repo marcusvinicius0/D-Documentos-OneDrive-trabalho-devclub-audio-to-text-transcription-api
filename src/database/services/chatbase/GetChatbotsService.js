@@ -2,10 +2,10 @@ import { AppError } from "../../../errors/app.error.js";
 import prismaClient from "../../../prisma/connect.js";
 
 class GetChatbotsService {
-  async execute({ userSession }) {
+  async execute({ slug }) {
     const isChatbot = await prismaClient.chatbot.findMany({
       where: {
-        authorEmail: userSession,
+        authorName: slug,
       },
       include: {
         Files: true,

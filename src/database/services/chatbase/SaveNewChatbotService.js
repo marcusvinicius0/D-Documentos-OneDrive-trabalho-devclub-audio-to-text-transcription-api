@@ -28,6 +28,12 @@ class SaveNewChatbotService {
       throw new AppError("Não pode ter dois bots com o mesmo nome.", 403);
     }
 
+    const findUser = await prismaClient.user.findFirst({
+      where: {
+        email: authorEmail,
+      }
+    })
+
     const createNewChatbot = await prismaClient.chatbot.create({
       data: {
         model: chatbotDataStructure.model,
@@ -35,6 +41,7 @@ class SaveNewChatbotService {
         authorName: chatbotDataStructure.authorName,
         name: chatbotDataStructure.chatbotName,
         slug: chatbotDataStructure.slug,
+        userId: findUser.id,
       },
       select: {
         id: true,

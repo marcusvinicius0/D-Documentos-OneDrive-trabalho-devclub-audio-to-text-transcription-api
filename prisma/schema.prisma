@@ -32,11 +32,24 @@ model Chatbot {
   Files       FilesForBotTraining[]
   Texts       TextsForBotTraining[]
   ChatSession ChatSession[]
+  User        User[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   @@map("user-chatbot")
+}
+
+model User {
+  id String @id @unique @default(uuid())
+
+  name      String
+  email     String
+  avatarUrl String?
+  chatbotId String?
+  Chatbot   Chatbot? @relation(fields: [chatbotId], references: [id])
+
+  @@map("user")
 }
 
 model FilesForBotTraining {

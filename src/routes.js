@@ -16,6 +16,7 @@ import { GetChatbotsController } from "./controllers/chatbase/chatbot/GetChatbot
 import { GetUniqueChatbotController } from "./controllers/chatbase/chatbot/GetUniqueChatbotController.js";
 import { GetTrainedFilesController } from "./controllers/chatbase/chatbot/GetTrainedFilesController.js";
 import { GetTrainedTextsController } from "./controllers/chatbase/chatbot/GetTrainedTextsController.js";
+import { CheckOrCreateUserController } from "./controllers/user/CheckOrCreateUserController.js";
 
 const routes = new Router();
 const multer_config = multer();
@@ -35,6 +36,8 @@ routes.get("/", async (req, res, next) => {
     return res.status(503).send();
   }
 });
+
+routes.post("/user/check-or-create", new CheckOrCreateUserController().store);
 
 routes.post("/new-chatbot", new SaveNewChatbotController().store);
 routes.post("/files-for-training/:id", multer_config.array("files"), new SaveFilesForTrainingController().store);
