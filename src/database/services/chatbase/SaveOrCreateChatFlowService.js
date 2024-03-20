@@ -1,13 +1,31 @@
+import { AppError } from "../../../errors/app.error.js";
 import prismaClient from "../../../prisma/connect.js";
 
 class SaveOrCreateChatFlowService {
-  async execute({ latestMessages }) {
+  async execute({ latestMessages, slug }) {
     const author = latestMessages[0];
     const bot = latestMessages[1];
 
-    let isSessionActive = await prismaClient.chatSession.findFirst({
+    const findChatbot = await prismaClient.chatbot.findFirst({
       where: {
-        userId: author.email,
+        OR: [
+          {
+            slug: slug,
+          },
+          {
+            authorEmail: slug,
+          },
+        ],
+      },
+    });
+
+    if (!findChatbot) {
+      throw new AppError("Nenhum bot foi encontrado.", 404);
+    }
+
+    const isSessionActive = await prismaClient.chatSession.findFirst({
+      where: {
+        chatbotId: findChatbot.id,
         isFiled: false,
       },
     });
@@ -15,8 +33,10 @@ class SaveOrCreateChatFlowService {
     if (!isSessionActive) {
       await prismaClient.chatSession.create({
         data: {
-          userId: author.email,
+          userId: findChatbot.authorEmail,
+          chatbotId: findChatbot.id,
           isFiled: false,
+          slug: slug,
         },
       });
     }
