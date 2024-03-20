@@ -1,27 +1,24 @@
 import { Router } from "express";
 import multer from "multer";
-import path from "node:path";
 
-import { speechToText } from "./service/edenai/speech-to-text.js";
-import { SaveTrancribedTextsController } from "./controllers/chatbase/SaveTranscribedTextsController.js";
-import { GetTranscribedTextsController } from "./controllers/chatbase/GetTranscribedTextsController.js";
+import { SaveNewChatbotController } from "./controllers/chatbase/chatbot/SaveNewChatbotController.js";
+import { SaveFilesForTrainingController } from "./controllers/chatbase/chatbot/SaveFilesForTrainingController.js";
+import { SaveTextsForTraningController } from "./controllers/chatbase/chatbot/SaveTextsForTrainingController.js";
+
 import { TrainChatbotController } from "./controllers/chatbase/TrainChatbotController.js";
-import { ChatSessionFlowController } from "./controllers/chatbase/ChatSessionFlowController.js";
-import { SaveChatFlowController } from "./controllers/chatbase/SaveChatFlowController.js";
-import { GetChatHistoryController } from "./controllers/chatbase/GetChatHistoryController.js";
-import { GetFiledTranscribedTextsController } from "./controllers/chatbase/GetFiledTranscribedTextsController.js";
+import { ChatSessionFlowController } from "./controllers/chatbase/chat-ui/ChatSessionFlowController.js";
+import { SaveChatFlowController } from "./controllers/chatbase/chat-ui/SaveChatFlowController.js";
+import { GetChatHistoryController } from "./controllers/chatbase/chat-ui/GetChatHistoryController.js";
+import { DeleteChatHistoryController } from "./controllers/chatbase/chat-ui/DeleteChatHistoryController.js";
+
 import { StartNewConnectSessionController } from "./controllers/wpp/StartNewConnectSessionController.js";
-import { DeleteChatHistoryController } from "./controllers/chatbase/DeleteChatHistoryController.js";
+import { GetChatbotsController } from "./controllers/chatbase/chatbot/GetChatbotsController.js";
+import { GetUniqueChatbotController } from "./controllers/chatbase/chatbot/GetUniqueChatbotController.js";
+import { GetTrainedFilesController } from "./controllers/chatbase/chatbot/GetTrainedFilesController.js";
+import { GetTrainedTextsController } from "./controllers/chatbase/chatbot/GetTrainedTextsController.js";
 
 const routes = new Router();
-
-const storage = multer.diskStorage({
-  filename: function (req, file, cb) {
-    cb(null, Date.now() + path.extname(file.originalname));
-  },
-});
-
-const upload = multer({ storage: storage, dest: "uploads/" });
+const multer_config = multer();
 
 routes.get("/", async (req, res, next) => {
   const healthCheck = {
@@ -39,35 +36,18 @@ routes.get("/", async (req, res, next) => {
   }
 });
 
-routes.post("/mp3file", upload.single("audio"), async (req, res) => {
-  if (!req.file) {
-    return res.status(400).send("Nenhum arquivo foi enviado.");
-  }
+routes.post("/new-chatbot", new SaveNewChatbotController().store);
+routes.post("/files-for-training/:id", multer_config.array("files"), new SaveFilesForTrainingController().store);
+routes.post("/texts-for-training/:id", new SaveTextsForTraningController().store);
 
-  try {
-    const filePath = req.file.path;
-    const result = await speechToText(filePath);
-
-    res.status(200).json({ message: "Arquivo transcrevido", data: result });
-  } catch (error) {
-    console.error("Erro na transcrição:", error);
-    if (req.file && req.file.path) {
-      fs.unlinkSync(req.file.path);
-    }
-
-    res.status(500).json({
-      message: "Erro ao transcrever arquivo",
-      error: error.toString(),
-    });
-  }
-});
-routes.post("/transcribed-text", new SaveTrancribedTextsController().store);
-routes.get("/transcribed-text/:id", new GetTranscribedTextsController().index);
-routes.get("/filed-transcribed-text/:id", new GetFiledTranscribedTextsController().index);
+routes.get("/chatbots/:id", new GetChatbotsController().index);
+routes.get("/chatbot/:id", new GetUniqueChatbotController().show);
+routes.get("/files-for-training/:id", new GetTrainedFilesController().index);
+routes.get("/texts-for-training/:id", new GetTrainedTextsController().index);
 
 routes.post("/train-chatbot/:id", new TrainChatbotController().store);
 routes.post("/chat-session/:id", new ChatSessionFlowController().store);
-routes.post("/save-chatflow", new SaveChatFlowController().store);
+routes.post("/save-chatflow/:id", new SaveChatFlowController().store);
 
 routes.get("/chat-history/:id", new GetChatHistoryController().index);
 routes.post("/wppconnection/:id", new StartNewConnectSessionController().store);
