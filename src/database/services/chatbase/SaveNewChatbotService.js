@@ -31,6 +31,9 @@ class SaveNewChatbotService {
     const findUser = await prismaClient.user.findFirst({
       where: {
         email: authorEmail,
+      },
+      select: {
+        id: true,
       }
     })
 
