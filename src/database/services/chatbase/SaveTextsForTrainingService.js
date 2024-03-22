@@ -20,7 +20,7 @@ class SaveTextsForTrainingService {
         author: textData.authorEmail,
         text: textData.text,
         chatbotId: isChatbot.id,
-        isTextTrained: false,
+        isTextTrained: true,
         textLength: text_length,
         slug: isChatbot.slug,
       }

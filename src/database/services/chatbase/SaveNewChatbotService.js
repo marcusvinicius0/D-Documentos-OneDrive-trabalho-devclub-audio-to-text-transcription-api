@@ -21,7 +21,7 @@ class SaveNewChatbotService {
     const isChatbotSameName = await prismaClient.chatbot.findFirst({
       where: {
         slug: chatbotName,
-      }
+      },
     });
 
     if (isChatbotSameName) {
@@ -34,8 +34,8 @@ class SaveNewChatbotService {
       },
       select: {
         id: true,
-      }
-    })
+      },
+    });
 
     const createNewChatbot = await prismaClient.chatbot.create({
       data: {
@@ -48,7 +48,7 @@ class SaveNewChatbotService {
       },
       select: {
         id: true,
-      }
+      },
     });
 
     return createNewChatbot;
