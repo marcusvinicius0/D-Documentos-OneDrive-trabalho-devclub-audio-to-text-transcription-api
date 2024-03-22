@@ -89,13 +89,13 @@ model TextsForBotTraining {
 
 model ChatSession {
   id      String  @id @unique @default(uuid())
-  userId  String  @unique
+  userId  String  
   isFiled Boolean @default(false)
 
   chatbotId       String            @default("")
   Chatbot         Chatbot           @relation(fields: [chatbotId], references: [id])
   ChatbotMessages ChatbotMessages[]
-  slug            String            @default("")
+  slug            String            @default("") 
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

@@ -38,7 +38,6 @@ routes.get("/", async (req, res, next) => {
 });
 
 routes.post("/user/check-or-create", new CheckOrCreateUserController().store);
-
 routes.post("/new-chatbot", new SaveNewChatbotController().store);
 routes.post("/files-for-training/:id", multer_config.array("files"), new SaveFilesForTrainingController().store);
 routes.post("/texts-for-training/:id", new SaveTextsForTraningController().store);

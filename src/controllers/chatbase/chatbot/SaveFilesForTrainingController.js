@@ -1,6 +1,8 @@
 import { speechToTextEdenAI } from "../../../service/edenai/speech-to-text.js";
 import { createSaveFilesForTrainingService } from "../../../utils/services.js";
 
+import fs from "node:fs";
+
 class SaveFilesForTrainingController {
   async store(req, res, next) {
     try {
@@ -12,6 +14,14 @@ class SaveFilesForTrainingController {
           const text = transcription;
           return text;
         })
+
+        const fullTexts = texts.map((transcription) => {
+          const text = transcription.transcription.results.openai.text;
+
+          return text;
+        })
+
+          fs.writeFileSync("./src/utils/chatbot-content.js", JSON.stringify(fullTexts, null, 2), { encoding: "utf-8" });
 
         createSaveFilesForTrainingService;
         const service = await createSaveFilesForTrainingService.execute({ texts, chatbotId });
