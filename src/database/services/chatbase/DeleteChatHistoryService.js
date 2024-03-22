@@ -5,8 +5,11 @@ class DeleteChatHistoryService {
   async execute({ slug }) {
     const isChatSession = await prismaClient.chatSession.findFirst({
       where: {
-        userId: slug,
+        slug: slug,
       },
+      select: {
+        id: true,
+      }
     });
 
     const isChatHistory = await prismaClient.chatbotMessages.findFirst({

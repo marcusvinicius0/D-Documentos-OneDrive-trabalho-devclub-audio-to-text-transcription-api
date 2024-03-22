@@ -10,7 +10,7 @@ class GetTrainedTextsService {
             slug: slug,
           },
           {
-            isTextTrained: false,
+            isTextTrained: true,
           },
         ],
       },

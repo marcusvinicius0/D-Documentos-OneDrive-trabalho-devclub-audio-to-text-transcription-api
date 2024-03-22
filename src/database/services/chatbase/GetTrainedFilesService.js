@@ -10,7 +10,7 @@ class GetTrainedFilesService {
             slug: slug,
           },
           {
-            isFileTrained: false,
+            isFileTrained: true,
           },
         ],
       },

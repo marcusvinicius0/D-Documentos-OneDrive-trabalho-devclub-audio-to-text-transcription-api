@@ -24,7 +24,7 @@ class SaveFilesForTrainingService {
           chatbotId: isChatbot.id,
           message: text,
           fileName: filename,
-          isFileTrained: false,
+          isFileTrained: true,
           messageLength: message_length,
           slug: isChatbot.slug,
         },

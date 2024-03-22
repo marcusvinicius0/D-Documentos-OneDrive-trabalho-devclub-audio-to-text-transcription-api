@@ -17,6 +17,12 @@ class SaveOrCreateChatFlowService {
           },
         ],
       },
+      select: {
+        id: true,
+        userId: true,
+        authorEmail: true,
+        authorName: true,
+      }
     });
 
     if (!findChatbot) {
@@ -25,9 +31,18 @@ class SaveOrCreateChatFlowService {
 
     const isSessionActive = await prismaClient.chatSession.findFirst({
       where: {
-        chatbotId: findChatbot.id,
-        isFiled: false,
+        AND: [
+          {
+            chatbotId: findChatbot.id,
+          },
+          {
+            isFiled: false,
+          }
+        ]
       },
+      select: {
+        id: true,
+      }
     });
 
     if (!isSessionActive) {
@@ -37,11 +52,27 @@ class SaveOrCreateChatFlowService {
           chatbotId: findChatbot.id,
           isFiled: false,
           slug: slug,
-        },
+        }
       });
     }
 
-    const chat_session_id = isSessionActive.id;
+    const getSessionCreated = await prismaClient.chatSession.findFirst({
+      where: {
+        AND: [
+          {
+            chatbotId: findChatbot.id,
+          },
+          {
+            isFiled: false,
+          }
+        ]
+      },
+      select: {
+        id: true,
+      }
+    })
+
+    const chat_session_id = getSessionCreated.id;
 
     const saveChatFlow = await prismaClient.chatbotMessages.create({
       data: {
@@ -50,6 +81,15 @@ class SaveOrCreateChatFlowService {
         bot: bot,
         isFiled: false,
       },
+      select: {
+        id: true,
+        chatSessionId: true,
+        sender: true,
+        bot: true,
+        isFiled: true,
+        createdAt: true,
+        updatedAt: true,
+      }
     });
 
     return saveChatFlow;

@@ -19,8 +19,11 @@ export async function initializeNewAIChatSession(chatId) {
 
   if (activeChats.has(chatId)) return;
 
+  const fileDataPath = "./src/utils/chatbot-content.js";
 
-  const currentDataForTraining = fs.readFileSync('./src/utils/chatbot-content.js', { encoding: 'utf-8' });
+  const currentDataForTraining = fs.readFileSync(fileDataPath, {
+    encoding: "utf-8",
+  });
 
   const thread = await openai.beta.threads.create({
     messages: [{ role: "user", content: currentDataForTraining }],
