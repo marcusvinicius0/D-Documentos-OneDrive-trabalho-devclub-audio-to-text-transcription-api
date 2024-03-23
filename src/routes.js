@@ -5,7 +5,6 @@ import { SaveNewChatbotController } from "./controllers/chatbase/chatbot/SaveNew
 import { SaveFilesForTrainingController } from "./controllers/chatbase/chatbot/SaveFilesForTrainingController.js";
 import { SaveTextsForTraningController } from "./controllers/chatbase/chatbot/SaveTextsForTrainingController.js";
 
-import { TrainChatbotController } from "./controllers/chatbase/TrainChatbotController.js";
 import { ChatSessionFlowController } from "./controllers/chatbase/chat-ui/ChatSessionFlowController.js";
 import { SaveChatFlowController } from "./controllers/chatbase/chat-ui/SaveChatFlowController.js";
 import { GetChatHistoryController } from "./controllers/chatbase/chat-ui/GetChatHistoryController.js";
@@ -17,6 +16,8 @@ import { GetUniqueChatbotController } from "./controllers/chatbase/chatbot/GetUn
 import { GetTrainedFilesController } from "./controllers/chatbase/chatbot/GetTrainedFilesController.js";
 import { GetTrainedTextsController } from "./controllers/chatbase/chatbot/GetTrainedTextsController.js";
 import { CheckOrCreateUserController } from "./controllers/user/CheckOrCreateUserController.js";
+import { UpdateChatbotWithFilesController } from "./controllers/chatbase/chatbot/UpdateChatbotWithFilesController.js";
+import { UpdateChatbotWithTextController } from "./controllers/chatbase/chatbot/UpdateChatbotWithTextController.js";
 
 const routes = new Router();
 const multer_config = multer();
@@ -38,21 +39,22 @@ routes.get("/", async (req, res, next) => {
 });
 
 routes.post("/user/check-or-create", new CheckOrCreateUserController().store);
-routes.post("/new-chatbot", new SaveNewChatbotController().store);
-routes.post("/files-for-training/:id", multer_config.array("files"), new SaveFilesForTrainingController().store);
-routes.post("/texts-for-training/:id", new SaveTextsForTraningController().store);
+routes.post("/chatbot/new", new SaveNewChatbotController().store);
+routes.post("/chatbot/files-for-training/:id", multer_config.array("files"), new SaveFilesForTrainingController().store);
+routes.post("/chatbot/texts-for-training/:id", new SaveTextsForTraningController().store);
 
 routes.get("/chatbots/:id", new GetChatbotsController().index);
 routes.get("/chatbot/:id", new GetUniqueChatbotController().show);
-routes.get("/files-for-training/:id", new GetTrainedFilesController().index);
-routes.get("/texts-for-training/:id", new GetTrainedTextsController().index);
+routes.get("/chatbot/files-for-training/:id", new GetTrainedFilesController().index);
+routes.get("/chatbot/texts-for-training/:id", new GetTrainedTextsController().index);
+routes.put("/chatbot/files-retraining/:id", new UpdateChatbotWithFilesController().update);
+routes.put("/chatbot/texts-retraining/:id", new UpdateChatbotWithTextController().update);
 
-routes.post("/train-chatbot/:id", new TrainChatbotController().store);
-routes.post("/chat-session/:id", new ChatSessionFlowController().store);
-routes.post("/save-chatflow/:id", new SaveChatFlowController().store);
+routes.post("/chatbot/chat-session/:id", new ChatSessionFlowController().store);
+routes.post("/chatbot/save-chatflow/:id", new SaveChatFlowController().store);
+routes.get("/chatbot/chat-history/:id", new GetChatHistoryController().index);
+routes.delete("/chatbot/chat-history/:id", new DeleteChatHistoryController().delete);
 
-routes.get("/chat-history/:id", new GetChatHistoryController().index);
-routes.post("/wppconnection/:id", new StartNewConnectSessionController().store);
-routes.delete("/chat-history/:id", new DeleteChatHistoryController().delete);
+routes.post("/chatbot/wppconnection/:id", new StartNewConnectSessionController().store);
 
 export default routes;

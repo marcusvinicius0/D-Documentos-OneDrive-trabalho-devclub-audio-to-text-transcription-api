@@ -8,10 +8,7 @@ import { SaveFilesForTrainingService } from "../database/services/chatbase/SaveF
 import { SaveNewChatbotService } from "../database/services/chatbase/SaveNewChatbotService.js";
 import { SaveOrCreateChatFlowService } from "../database/services/chatbase/SaveOrCreateChatFlowService.js";
 import { SaveTextsForTrainingService } from "../database/services/chatbase/SaveTextsForTrainingService.js";
-import { TrainChatbotService } from "../database/services/chatbase/TrainChatbotService.js";
 import { CheckOrCreateUserService } from "../database/services/user/CheckOrCreateUserService.js";
-
-export const createTrainChatbotService = new TrainChatbotService();
 
 export const createSaveNewChatbotService = new SaveNewChatbotService();
 export const createSaveFilesForTrainingService = new SaveFilesForTrainingService();
