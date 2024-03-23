@@ -21,7 +21,7 @@ class SaveFilesForTrainingController {
           return text;
         })
 
-          fs.writeFileSync("./src/utils/chatbot-content.js", JSON.stringify(fullTexts, null, 2), { encoding: "utf-8" });
+        fs.writeFileSync("./src/utils/chatbot-content.js", JSON.stringify(fullTexts, null, 2), { encoding: "utf-8" });
 
         createSaveFilesForTrainingService;
         const service = await createSaveFilesForTrainingService.execute({ texts, chatbotId });

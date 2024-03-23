@@ -34,6 +34,11 @@ class App {
       exposedHeaders: ["Access-Control-Allow-Origin"],
     }));
     this.app.use(express.urlencoded({ extended: true, limit: "3mb" }));
+
+    this.app.use((req, res, next) => {
+      console.log(`Received ${req.method} request for ${req.url}. Current process memory usage: ${JSON.stringify(process.memoryUsage())} bytes.`);
+      next();
+    })
   }
 
   middlewares() {
