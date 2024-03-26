@@ -20,7 +20,14 @@ class SaveNewChatbotService {
 
     const isChatbotSameName = await prismaClient.chatbot.findFirst({
       where: {
-        slug: chatbotName,
+        AND: [
+          {
+            slug: chatbotName,
+          },
+          {
+            authorEmail: chatbotDataStructure.authorEmail,
+          },
+        ],
       },
     });
 
