@@ -5,8 +5,10 @@ class DeleteChatbotController {
     try {
       const chatbotName = req.params.id;
 
+      const { email } = req.body;
+
       createDeleteChatbotService;
-      const service = await createDeleteChatbotService.execute({ chatbotName });
+      const service = await createDeleteChatbotService.execute({ chatbotName, email });
 
       return res.status(200).json(service);
     } catch (error) {
