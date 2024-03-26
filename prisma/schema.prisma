@@ -27,7 +27,7 @@ model Chatbot {
   imageUrl      String?           @default("")
   authorEmail   String            @default("")
   authorName    String
-  slug          String            @unique @default("")
+  slug          String            @default("")
   userId        String            @default("")
 
   Files       FilesForBotTraining[]
@@ -45,7 +45,7 @@ model User {
   id String @id @unique @default(uuid())
 
   name      String
-  email     String
+  email     String   @unique
   avatarUrl String?
   chatbotId String?
   Chatbot   Chatbot? @relation(fields: [chatbotId], references: [id])
@@ -89,13 +89,13 @@ model TextsForBotTraining {
 
 model ChatSession {
   id      String  @id @unique @default(uuid())
-  userId  String  
+  userId  String
   isFiled Boolean @default(false)
 
   chatbotId       String            @default("")
   Chatbot         Chatbot           @relation(fields: [chatbotId], references: [id])
   ChatbotMessages ChatbotMessages[]
-  slug            String            @default("") 
+  slug            String            @default("")
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
