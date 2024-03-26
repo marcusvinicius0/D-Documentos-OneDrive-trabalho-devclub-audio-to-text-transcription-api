@@ -9,8 +9,18 @@ class DeleteChatHistoryService {
       },
       select: {
         id: true,
+        userId: true,
       }
     });
+
+    const getChatbot = await prismaClient.chatbot.findFirst({
+      where: {
+        authorEmail: isChatSession.userId,
+      },
+      select: {
+        id: true
+      }
+    })
 
     const isChatHistory = await prismaClient.chatbotMessages.findFirst({
       where: {
@@ -22,13 +32,13 @@ class DeleteChatHistoryService {
       throw new AppError("Nenhum histórico de conversa foi encontrado.", 404);
     }
 
-    const deleteChatHistory = await prismaClient.chatbotMessages.deleteMany({
+    await prismaClient.chatbotMessages.deleteMany({
       where: {
         chatSessionId: isChatSession.id,
       },
     });
 
-    return { deleteChatHistory };
+    return getChatbot;
   }
 }
 

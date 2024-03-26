@@ -3,11 +3,11 @@ import { createGetChatHistoryService } from "../../../utils/services.js";
 class GetChatHistoryController {
   async index(req, res, next) {
     try {
-      const slug = req.params.id;
+      const chatbotIdentification = req.params.id;
 
       createGetChatHistoryService;
       const service = await createGetChatHistoryService.execute({
-        slug,
+        chatbotIdentification,
       });
 
       return res.status(200).json(service);

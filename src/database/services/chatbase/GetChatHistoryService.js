@@ -1,12 +1,15 @@
 import prismaClient from "../../../prisma/connect.js";
 
 class GetChatHistoryService {
-  async execute({ slug }) {
+  async execute({ chatbotIdentification }) {
     const findUserChatSession = await prismaClient.chatSession.findFirst({
       where: {
-        slug: slug,
-      }
-    })
+        chatbotId: chatbotIdentification,
+      },
+      select: {
+        id: true,
+      },
+    });
 
     if (!findUserChatSession) {
       return [];
@@ -16,7 +19,7 @@ class GetChatHistoryService {
 
     const getChatHistory = await prismaClient.chatbotMessages.findMany({
       where: {
-        chatSessionId: session_id
+        chatSessionId: session_id,
       },
       select: {
         id: true,
@@ -26,11 +29,10 @@ class GetChatHistoryService {
         isFiled: true,
         createdAt: true,
         updatedAt: true,
-      }
-    })
+      },
+    });
 
     return getChatHistory;
-
   }
 }
 
