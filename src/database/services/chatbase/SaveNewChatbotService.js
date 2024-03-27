@@ -22,13 +22,21 @@ class SaveNewChatbotService {
       where: {
         AND: [
           {
-            slug: chatbotName,
+            name: {
+              equals: chatbotName,
+              mode: "insensitive",
+            },
           },
           {
             authorEmail: chatbotDataStructure.authorEmail,
           },
         ],
       },
+      select: {
+        name: true,
+        slug: true,
+        authorEmail: true,
+      }
     });
 
     if (isChatbotSameName) {
