@@ -10,14 +10,15 @@ class SaveTextsForTraningController {
 
       const text = textData.text;
       let existingContent = "";
+      const path = "./src/utils/chatbot-content.txt";
 
-      if (fs.existsSync("./src/utils/chatbot-content.js")) {
-        existingContent = fs.readFileSync("./src/utils/chatbot-content.js", { encoding: "utf-8" })
+      if (fs.existsSync(path)) {
+        existingContent = fs.readFileSync(path, { encoding: "utf-8" })
       }
 
       const newTexts = existingContent + text;
 
-      fs.writeFileSync("./src/utils/chatbot-content.js", JSON.stringify(newTexts, null, 2), { encoding: "utf-8" });
+      fs.writeFileSync(path, JSON.stringify(newTexts, null, 2), { encoding: "utf-8" });
 
       createSaveTextsForTrainingService;
       const service = await createSaveTextsForTrainingService.execute({ textData, chatbotId });

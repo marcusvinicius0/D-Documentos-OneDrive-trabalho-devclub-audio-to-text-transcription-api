@@ -4,28 +4,26 @@ const messageBufferPerChatId = new Map();
 const messageTimeouts = new Map();
 
 import { io } from "../../server.js";
-import { initializeNewAIChatSession, mainOpenAI } from "../openai.js";
+import { startChatWithAssistant } from "../runAssistant.js";
 
-export async function startNewWppConnectSession(onQRCode) {
+export async function startNewWppConnectSession(chatbotId, onQRCodeCallback) {
   wppconnect
     .create({
-      session: "sessioName",
+      session: chatbotId,
       catchQR: (base64Qrimg, asciiQR, attempts, urlCode) => {
-        console.log("terminal qrcode: ", asciiQR);
-        onQRCode({ base64Qrimg, asciiQR, attempts, urlCode });
+        onQRCodeCallback({ base64Qrimg, asciiQR, attempts, urlCode });
       },
       statusFind: (statusSession, session) => {
         console.log("Status session: ", statusSession);
         console.log("Session name: ", session);
       },
-      headless: true, 
+      headless: true,
       puppeteerOptions: {
-        args: ['--no-sandbox', '--headless', '--disable-gpu'],
-      }
-    }) 
+        args: ["--no-sandbox", "--headless", "--disable-gpu"],
+      },
+    })
     .then((client) => {
-      start(client);
-      console.log("started wpp connect", client);
+      start(client, chatbotId);
       io.emit("wppsession", "Connected to wpp.");
     })
     .catch((error) => {
@@ -34,7 +32,7 @@ export async function startNewWppConnectSession(onQRCode) {
     });
 }
 
-async function start(client) {
+async function start(client, chatbotId) {
   client.onMessage((message) => {
     (async () => {
       if (
@@ -44,7 +42,6 @@ async function start(client) {
       ) {
         const chatId = message.chatId;
         console.log("Mensagem recebida:", message.body);
-        await initializeNewAIChatSession(chatId);
 
         if (!messageBufferPerChatId.has(chatId)) {
           messageBufferPerChatId.set(chatId, []);
@@ -62,16 +59,14 @@ async function start(client) {
           chatId,
           setTimeout(() => {
             (async () => {
-              console.log(
-                "Gerando resposta para: ",
-                [...messageBufferPerChatId.get(chatId)].join(" \n ")
-              );
+              console.log("Gerando resposta para: ", [...messageBufferPerChatId.get(chatId)].join(" \n "));
               const currentMessage = [
                 ...messageBufferPerChatId.get(chatId),
               ].join(" \n ");
-              const answer = await mainOpenAI({
+           
+              const answer = await startChatWithAssistant({
                 currentMessage,
-                chatId,
+                chatbotId,
               });
 
               console.log("Enviando mensagens...");

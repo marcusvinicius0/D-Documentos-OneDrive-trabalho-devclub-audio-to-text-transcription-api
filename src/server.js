@@ -7,7 +7,6 @@ import cors from "cors";
 import routes from "./routes.js";
 import { errorHandler } from "./middlewares/error-handler.middleware.js";
 
-
 class App {
   constructor() {
     this.app = express();
