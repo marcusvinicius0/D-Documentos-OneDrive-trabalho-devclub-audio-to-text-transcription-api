@@ -29,6 +29,8 @@ model Chatbot {
   authorName    String
   slug          String            @default("")
   userId        String            @default("")
+  assistantId   String            @default("")
+  threadId      String            @default("")
 
   Files       FilesForBotTraining[]
   Texts       TextsForBotTraining[]

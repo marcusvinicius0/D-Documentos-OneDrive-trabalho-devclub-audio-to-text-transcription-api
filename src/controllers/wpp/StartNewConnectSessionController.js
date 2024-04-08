@@ -5,14 +5,15 @@ class StartNewConnectSessionController {
   async store(req, res, next) {
     try {
       const userSession = req.params.id;
+      const { chatbotId } = req.body;
 
       if (!userSession) {
         throw new AppError("Nenhuma credencial foi encontrada.", 401);
       }
 
-      await startNewWppConnectSession((onQRCode) => {
-        if (onQRCode) {
-          res.status(200).json(onQRCode);
+      await startNewWppConnectSession(chatbotId, async (onQRCodeData) => {
+        if (onQRCodeData) {
+          return res.status(200).json(onQRCodeData);
         }
       });
     } catch (error) {

@@ -11,7 +11,7 @@ class SaveNewChatbotService {
     }
 
     const chatbotDataStructure = {
-      model: "gpt-3.5-turbo-16k-0613",
+      model: "gpt-3.5-turbo",
       authorEmail: authorEmail,
       authorName: authorName,
       chatbotName: chatbotName,

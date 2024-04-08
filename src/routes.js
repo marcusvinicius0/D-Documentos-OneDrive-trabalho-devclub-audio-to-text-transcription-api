@@ -19,6 +19,7 @@ import { CheckOrCreateUserController } from "./controllers/user/CheckOrCreateUse
 import { UpdateChatbotWithFilesController } from "./controllers/chatbase/chatbot/UpdateChatbotWithFilesController.js";
 import { UpdateChatbotWithTextController } from "./controllers/chatbase/chatbot/UpdateChatbotWithTextController.js";
 import { DeleteChatbotController } from "./controllers/chatbase/chatbot/DeleteChatbotController.js";
+import { SaveNewAssistantController } from "./controllers/chatbase/chatbot/SaveNewAssistantController.js";
 
 const routes = new Router();
 const multer_config = multer();
@@ -44,6 +45,7 @@ routes.post("/chatbot/new", new SaveNewChatbotController().store);
 routes.post("/chatbot/files-for-training/:id", multer_config.array("files"), new SaveFilesForTrainingController().store);
 routes.post("/chatbot/texts-for-training/:id", new SaveTextsForTraningController().store);
 routes.delete("/chatbot/delete/:id", new DeleteChatbotController().delete);
+routes.post("/chatbot/new/assistant/:id", new SaveNewAssistantController().store);
 
 routes.get("/chatbots/:id", new GetChatbotsController().index);
 routes.get("/chatbot/:id", new GetUniqueChatbotController().show);
