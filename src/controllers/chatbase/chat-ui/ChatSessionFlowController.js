@@ -1,15 +1,12 @@
-import { initializeNewAIChatSession, mainOpenAI } from "../../../service/openai.js";
+import { startChatWithAssistant } from "../../../service/runAssistant.js";
 
 class ChatSessionFlowController {
   async store(req, res, next) {
     try {
-      const userSession = req.params.id;
-      const body = req.body;
-      const currentUserMessage = body.message;
-      const chatId = userSession;
+      const chatbotName = req.params.id;
+      const { message, chatbotId } = req.body;
 
-      await initializeNewAIChatSession(chatId);
-      const AIService = await mainOpenAI({ currentMessage: currentUserMessage, chatId });
+      const AIService = await startChatWithAssistant({ currentMessage: message, chatbotName, chatbotId });
 
       return res.status(200).json(AIService);
     } catch (error) {
