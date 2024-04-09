@@ -2,6 +2,7 @@ import OpenAI from "openai";
 import dotenv from "dotenv";
 import fs from "fs";
 import prismaClient from "../prisma/connect.js";
+import { AppError } from "../errors/app.error.js";
 
 dotenv.config();
 
@@ -22,9 +23,24 @@ export async function runAssistant(chatbot_id) {
     const assistant = await openai.beta.assistants.create(assistantConfig);
     assistantDetails = { assistantId: assistant.id, ...assistantConfig };
 
-    await prismaClient.chatbot.update({
+    const findChatbot = await prismaClient.chatbot.findFirst({
       where: {
         id: chatbot_id,
+      },
+      select: {
+        id: true,
+      }
+    })
+
+    if (!findChatbot) {
+      throw new AppError(`Chatbot com o ID ${chatbot_id} não encontrado.`, 404);
+    }
+
+    const chatbotId = findChatbot.id || "";
+
+    await prismaClient.chatbot.update({
+      where: {
+        id: chatbotId,
       },
       data: {
         assistantId: assistant.id,
@@ -56,13 +72,12 @@ export async function runAssistant(chatbot_id) {
 
     await prismaClient.chatbot.update({
       where: {
-        id: chatbot_id,
+        id: chatbotId,
       },
       data: {
         threadId: thread.id,
       },
     });
-
   } catch (error) {
     console.error(error);
   }
@@ -70,7 +85,6 @@ export async function runAssistant(chatbot_id) {
 
 export async function startChatWithAssistant({
   currentMessage,
-  chatbotName,
   chatbotId,
 }) {
   const getAssistantThreadId = await prismaClient.chatbot.findFirst({
@@ -114,11 +128,7 @@ export async function startChatWithAssistant({
 
   const messages = await openai.beta.threads.messages.list(getAssistantThreadId.threadId);
 
-  const lastMessageForRun = messages.data
-    .filter(
-      (message) => message.run_id === run.id && message.role === "assistant"
-    )
-    .pop();
+  const lastMessageForRun = messages.data.filter((message) => message.run_id === run.id && message.role === "assistant").pop();
 
   if (lastMessageForRun) {
     console.log(`${lastMessageForRun.content[0].text.value} \n`);
