@@ -62,7 +62,6 @@ export async function runAssistant(chatbot_id) {
         threadId: thread.id,
       },
     });
-
   } catch (error) {
     console.error(error);
   }
@@ -70,7 +69,6 @@ export async function runAssistant(chatbot_id) {
 
 export async function startChatWithAssistant({
   currentMessage,
-  chatbotName,
   chatbotId,
 }) {
   const getAssistantThreadId = await prismaClient.chatbot.findFirst({
@@ -114,11 +112,7 @@ export async function startChatWithAssistant({
 
   const messages = await openai.beta.threads.messages.list(getAssistantThreadId.threadId);
 
-  const lastMessageForRun = messages.data
-    .filter(
-      (message) => message.run_id === run.id && message.role === "assistant"
-    )
-    .pop();
+  const lastMessageForRun = messages.data.filter((message) => message.run_id === run.id && message.role === "assistant").pop();
 
   if (lastMessageForRun) {
     console.log(`${lastMessageForRun.content[0].text.value} \n`);
