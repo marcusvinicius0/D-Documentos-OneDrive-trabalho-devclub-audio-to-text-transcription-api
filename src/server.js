@@ -3,7 +3,6 @@ import { Server as SocketIOServer } from "socket.io";
 import express from "express";
 import "dotenv/config";
 
-import cors from "cors";
 import routes from "./routes.js";
 import { errorHandler } from "./middlewares/error-handler.middleware.js";
 
@@ -21,23 +20,37 @@ class App {
   }
 
   configureApp() {
-    this.app.use(cors({
-      origin: [
+    this.app.use((req, res, next) => {
+      const allowedOrigins = [
         "https://chatbotdevclub.netlify.app",
         "http://localhost:3000",
         "http://127.0.0.1:5500",
         "http://localhost:3001",
-      ],
-      methods: ["GET", "POST", "PUT", "PATCH", "OPTIONS", "DELETE"],
-      allowedHeaders: ["Content-Type", "Authorization"], 
-      exposedHeaders: ["Access-Control-Allow-Origin"],
-    }));
+      ];
+
+      const origin = req.headers.origin;
+      if (allowedOrigins.includes(origin)) {
+        res.header("Access-Control-Allow-Origin", origin);
+      }
+
+      res.header("Access-Control-Allow-Methods", "POST, GET, PUT, PATCH, OPTIONS, DELETE");
+      res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
+      res.header("Access-Control-Allow-Credentials", true);
+      next();
+    });
+
     this.app.use(express.urlencoded({ extended: true, limit: "3mb" }));
 
     this.app.use((req, res, next) => {
-      console.log(`Received ${req.method} request for ${req.url}. Current process memory usage: ${JSON.stringify(process.memoryUsage())} bytes.`);
+      console.log(
+        `Received ${req.method} request for ${
+          req.url
+        }. Current process memory usage: ${JSON.stringify(
+          process.memoryUsage()
+        )} bytes.`
+      );
       next();
-    })
+    });
   }
 
   middlewares() {
@@ -51,11 +64,10 @@ class App {
 
   configureSocket() {
     this.io.on("connection", (socket) => {
-      console.log("Um usuário conectou", socket.id);
-
-      socket.on("disconnect", () => {
-        console.log("Usuário desconectou", socket.id);
-      });
+      // console.log("Um usuário conectou", socket.id);
+      // socket.on("disconnect", () => {
+      //   console.log("Usuário desconectou", socket.id);
+      // });
     });
   }
 }
