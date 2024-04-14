@@ -7,7 +7,7 @@ class SaveNewAssistantController {
 
       const createRunAssistant = await runAssistant(chatbot_id);
 
-      return res.status(200).json(createRunAssistant);
+      return res.status(201).json(createRunAssistant);
     } catch (error) {
       next(error)
     }
