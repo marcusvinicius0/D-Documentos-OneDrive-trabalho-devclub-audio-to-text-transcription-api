@@ -5,6 +5,7 @@ const messageTimeouts = new Map();
 
 import { io } from "../../server.js";
 import { startChatWithAssistant } from "../runAssistant.js";
+import prismaClient from "../../prisma/connect.js";
 
 export async function startNewWppConnectSession(chatbotId, onQRCodeCallback) {
   wppconnect
@@ -14,8 +15,42 @@ export async function startNewWppConnectSession(chatbotId, onQRCodeCallback) {
         onQRCodeCallback({ base64Qrimg, asciiQR, attempts, urlCode });
       },
       statusFind: (statusSession, session) => {
-        console.log("Status session: ", statusSession);
-        console.log("Session name: ", session);
+        const wppSessionStatus = [
+          "qrReadSuccess",
+          "inChat",
+          "desconnectedMobile",
+          "notLogged",
+          "browserClose",
+          "qrReadError",
+        ];
+      
+        if (wppSessionStatus.includes(statusSession)) {
+          const findAndUpdate = async () => {
+            const find = await prismaClient.chatbot.findFirst({
+              where: {
+                id: session,
+              },
+              select: {
+                id: true,
+              },
+            });
+      
+            const update = await prismaClient.chatbot.update({
+              where: {
+                id: find.id,
+              },
+              data: {
+                wppSessionStatus: statusSession,
+              },
+              select: {
+                id: true,
+                wppSessionStatus: true,
+              },
+            });
+      
+            return update.wppSessionStatus;
+          };
+        }
       },
       headless: true,
       puppeteerOptions: {
@@ -23,12 +58,11 @@ export async function startNewWppConnectSession(chatbotId, onQRCodeCallback) {
       },
     })
     .then((client) => {
-      start(client, chatbotId);
       io.emit("wppsession", "Connected to wpp.");
+      start(client, chatbotId);
     })
     .catch((error) => {
       console.error(error);
-      io.emit("Erro ao conectar com whatsapp. ", error);
     });
 }
 
@@ -59,11 +93,14 @@ async function start(client, chatbotId) {
           chatId,
           setTimeout(() => {
             (async () => {
-              console.log("Gerando resposta para: ", [...messageBufferPerChatId.get(chatId)].join(" \n "));
+              console.log(
+                "Gerando resposta para: ",
+                [...messageBufferPerChatId.get(chatId)].join(" \n ")
+              );
               const currentMessage = [
                 ...messageBufferPerChatId.get(chatId),
               ].join(" \n ");
-           
+
               const answer = await startChatWithAssistant({
                 currentMessage,
                 chatbotId,
