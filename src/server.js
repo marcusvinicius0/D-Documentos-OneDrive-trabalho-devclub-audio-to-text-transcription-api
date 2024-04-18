@@ -5,13 +5,25 @@ import "dotenv/config";
 
 import routes from "./routes.js";
 import { errorHandler } from "./middlewares/error-handler.middleware.js";
+import cors from "cors";
 
 class App {
   constructor() {
     this.app = express();
     this.httpServer = createServer(this.app);
+    this.app.use(cors());
     this.io = new SocketIOServer(this.httpServer, {
-      cors: {},
+      cors: {
+        origin: ["*"],
+
+      handlePreflightRequest: (req, res) => {
+          res.writeHead(200, {
+            "Access-Control-Allow-Origin": "*",
+            "Access-Control-Allow-Methods": ["GET", "POST", "PUT", "PATCH", "DELETE"],
+          });
+          res.end();
+        }
+      }
     });
     this.configureSocket();
     this.configureApp();
@@ -64,10 +76,6 @@ class App {
 
   configureSocket() {
     this.io.on("connection", (socket) => {
-      // console.log("Um usuário conectou", socket.id);
-      // socket.on("disconnect", () => {
-      //   console.log("Usuário desconectou", socket.id);
-      // });
     });
   }
 }
