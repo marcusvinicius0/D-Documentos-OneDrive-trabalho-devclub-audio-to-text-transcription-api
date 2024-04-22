@@ -18,20 +18,22 @@ enum ChatbotVisibility {
 }
 
 model Chatbot {
-  id               String            @id @unique @default(uuid())
-  name             String            @default("Chatbot")
-  status           ChatbotStatus     @default(Treinado)
-  visibility       ChatbotVisibility @default(Publico)
-  lastTrainedAt    DateTime          @updatedAt
-  model            String            @default("")
-  imageUrl         String?           @default("")
-  authorEmail      String            @default("")
-  authorName       String
-  slug             String            @default("")
-  userId           String            @default("")
-  assistantId      String            @default("")
-  threadId         String            @default("")
-  wppSessionStatus String            @default("")
+  id                     String            @id @unique @default(uuid())
+  name                   String            @default("Chatbot")
+  status                 ChatbotStatus     @default(Treinado)
+  visibility             ChatbotVisibility @default(Publico)
+  lastTrainedAt          DateTime          @updatedAt
+  model                  String            @default("")
+  imageUrl               String?           @default("")
+  authorEmail            String            @default("")
+  authorName             String
+  slug                   String            @default("")
+  userId                 String            @default("")
+  assistantId            String            @default("")
+  threadId               String            @default("")
+  wppSessionStatus       String            @default("")
+  creditMessagesPerMonth String            @default("0")
+  subscriptionPlans      Json[]
 
   Files       FilesForBotTraining[]
   Texts       TextsForBotTraining[]
