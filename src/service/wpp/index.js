@@ -105,7 +105,6 @@ async function start(client, chatbotId) {
         console.log("Aguardando novas mensagens...");
         messageTimeouts.set(
           chatId,
-          setTimeout(() => {
             (async () => {
               console.log(
                 "Gerando resposta para: ",
@@ -131,8 +130,7 @@ async function start(client, chatbotId) {
                 });
               messageBufferPerChatId.delete(chatId);
               messageTimeouts.delete(chatId);
-            })();
-          }, 10000)
+            })()
         );
       }
     })();
