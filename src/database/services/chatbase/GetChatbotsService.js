@@ -5,7 +5,14 @@ class GetChatbotsService {
   async execute({ slug }) {
     const isChatbot = await prismaClient.chatbot.findMany({
       where: {
-        authorName: slug,
+        OR: [
+          {
+            id: slug
+          },
+          {
+            authorName: slug,
+          }
+        ],
       },
       include: {
         Files: true,

@@ -2,12 +2,12 @@ import { AppError } from "../../../errors/app.error.js";
 import prismaClient from "../../../prisma/connect.js";
 
 class DeleteChatbotService {
-  async execute({ chatbotName, email }) {
+  async execute({ chatbotId, email }) {
     const findChatbot = await prismaClient.chatbot.findFirst({
       where: {
         AND: [
           {
-            name: chatbotName,
+            id: chatbotId,
           },
           {
             authorEmail: email,
