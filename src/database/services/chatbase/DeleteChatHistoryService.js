@@ -2,10 +2,10 @@ import prismaClient from "../../../prisma/connect.js";
 import { AppError } from "../../../errors/app.error.js";
 
 class DeleteChatHistoryService {
-  async execute({ slug }) {
+  async execute({ chatbotId }) {
     const isChatSession = await prismaClient.chatSession.findFirst({
       where: {
-        slug: slug,
+        chatbotId: chatbotId,
       },
       select: {
         id: true,

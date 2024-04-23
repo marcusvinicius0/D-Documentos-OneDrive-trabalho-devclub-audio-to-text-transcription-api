@@ -27,12 +27,6 @@ export async function startNewWppConnectSession(chatbotId, onQRCodeCallback) {
           "desconnectedMobile",
         ];
 
-        const desconnectedWppSessionStatus = [
-          "notLogged",
-          "browserClose",
-          "autoClose",
-        ];
-
         if (wppSessionStatus.includes(statusSession)) {
           const findAndUpdate = async () => {
             const find = await prismaClient.chatbot.findFirst({
@@ -60,11 +54,7 @@ export async function startNewWppConnectSession(chatbotId, onQRCodeCallback) {
             return update.wppSessionStatus;
           };
           findAndUpdate();
-        };
-
-        // if (desconnectedWppSessionStatus.includes(statusSession)) {
-        //   await clearTokenDirectory(directoryPath);
-        // }
+        }
       },
       headless: true,
       puppeteerOptions: {
@@ -103,34 +93,67 @@ async function start(client, chatbotId) {
           clearTimeout(messageTimeouts.get(chatId));
         }
         console.log("Aguardando novas mensagens...");
+
         messageTimeouts.set(
           chatId,
-            (async () => {
-              console.log(
-                "Gerando resposta para: ",
-                [...messageBufferPerChatId.get(chatId)].join(" \n ")
-              );
-              const currentMessage = [
-                ...messageBufferPerChatId.get(chatId),
-              ].join(" \n ");
+          (async () => {
+            console.log(
+              "Gerando resposta para: ",
+              [...messageBufferPerChatId.get(chatId)].join(" \n ")
+            );
+            const currentMessage = [...messageBufferPerChatId.get(chatId)].join(
+              " \n "
+            );
 
-              const answer = await startChatWithAssistant({
-                currentMessage,
-                chatbotId,
+            const answer = await startChatWithAssistant({
+              currentMessage,
+              chatbotId,
+            });
+
+            console.log("Enviando mensagens...");
+            client
+              .sendText(message.from, answer)
+              .then((result) => {
+                console.log("Mensagem enviada:", result.body);
+
+                const findAndUpdateChatbotMessagesAmount = async () => {
+                  const findChatbot = await prismaClient.chatbot.findUnique({
+                    where: {
+                      id: chatbotId,
+                    },
+                    select: {
+                      id: true,
+                      creditMessagesPerMonth: true,
+                    }
+                  });
+
+                  if (!findChatbot) {
+                    console.error("Chatbot não foi encontrado.", 404);
+                    return;
+                  }
+
+                  const currentCreditMessagesPerMonth = findChatbot.creditMessagesPerMonth || 0;
+                  const newCreditMessagesPerMonth = currentCreditMessagesPerMonth + 2;
+
+                  
+                  await prismaClient.chatbot.update({
+                    where: {
+                      id: chatbotId,
+                    },
+                    data: {
+                      creditMessagesPerMonth: newCreditMessagesPerMonth,
+                    }
+                  });
+                };
+
+                findAndUpdateChatbotMessagesAmount();
+              })
+              .catch((error) => {
+                console.error("Erro ao enviar mensagem:", error);
               });
-
-              console.log("Enviando mensagens...");
-              client
-                .sendText(message.from, answer)
-                .then((result) => {
-                  console.log("Mensagem enviada:", result.body);
-                })
-                .catch((error) => {
-                  console.error("Erro ao enviar mensagem:", error);
-                });
-              messageBufferPerChatId.delete(chatId);
-              messageTimeouts.delete(chatId);
-            })()
+            messageBufferPerChatId.delete(chatId);
+            messageTimeouts.delete(chatId);
+          })()
         );
       }
     })();
