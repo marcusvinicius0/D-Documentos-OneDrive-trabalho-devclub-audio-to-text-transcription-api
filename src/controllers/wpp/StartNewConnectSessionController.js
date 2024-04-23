@@ -4,10 +4,9 @@ import { startNewWppConnectSession } from "../../service/wpp/index.js";
 class StartNewConnectSessionController {
   async store(req, res, next) {
     try {
-      const userSession = req.params.id;
-      const { chatbotId } = req.body;
+      const chatbotId = req.params.id;
 
-      if (!userSession) {
+      if (!chatbotId) {
         throw new AppError("Nenhuma credencial foi encontrada.", 401);
       }
 
