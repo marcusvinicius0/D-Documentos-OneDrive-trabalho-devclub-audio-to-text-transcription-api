@@ -2,27 +2,20 @@ import { AppError } from "../../../errors/app.error.js";
 import prismaClient from "../../../prisma/connect.js";
 
 class SaveOrCreateChatFlowService {
-  async execute({ latestMessages, slug }) {
+  async execute({ latestMessages, chatbotId }) {
     const author = latestMessages[0];
     const bot = latestMessages[1];
 
     const findChatbot = await prismaClient.chatbot.findFirst({
       where: {
-        OR: [
-          {
-            slug: slug,
-          },
-          {
-            authorEmail: slug,
-          },
-        ],
+        id: chatbotId,
       },
       select: {
         id: true,
         userId: true,
         authorEmail: true,
         authorName: true,
-      }
+      },
     });
 
     if (!findChatbot) {
@@ -37,12 +30,12 @@ class SaveOrCreateChatFlowService {
           },
           {
             isFiled: false,
-          }
-        ]
+          },
+        ],
       },
       select: {
         id: true,
-      }
+      },
     });
 
     if (!isSessionActive) {
@@ -52,7 +45,7 @@ class SaveOrCreateChatFlowService {
           chatbotId: findChatbot.id,
           isFiled: false,
           slug: slug,
-        }
+        },
       });
     }
 
@@ -64,13 +57,13 @@ class SaveOrCreateChatFlowService {
           },
           {
             isFiled: false,
-          }
-        ]
+          },
+        ],
       },
       select: {
         id: true,
-      }
-    })
+      },
+    });
 
     const chat_session_id = getSessionCreated.id;
 
@@ -89,7 +82,7 @@ class SaveOrCreateChatFlowService {
         isFiled: true,
         createdAt: true,
         updatedAt: true,
-      }
+      },
     });
 
     return saveChatFlow;

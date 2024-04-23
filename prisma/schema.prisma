@@ -32,7 +32,7 @@ model Chatbot {
   assistantId            String            @default("")
   threadId               String            @default("")
   wppSessionStatus       String            @default("")
-  creditMessagesPerMonth String            @default("0")
+  creditMessagesPerMonth Int               @default(0)
   subscriptionPlans      Json[]
 
   Files       FilesForBotTraining[]

@@ -2,12 +2,12 @@ import { AppError } from "../../../errors/app.error.js";
 import prismaClient from "../../../prisma/connect.js";
 
 class GetTrainedTextsService {
-  async execute({ slug }) {
+  async execute({ chatbotId }) {
     const isTrainedTexts = await prismaClient.textsForBotTraining.findMany({
       where: {
         AND: [
           {
-            slug: slug,
+            chatbotId: chatbotId,
           },
           {
             isTextTrained: true,

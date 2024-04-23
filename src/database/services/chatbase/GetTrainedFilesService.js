@@ -2,12 +2,12 @@ import { AppError } from "../../../errors/app.error.js";
 import prismaClient from "../../../prisma/connect.js";
 
 class GetTrainedFilesService {
-  async execute({ slug }) {
+  async execute({ chatbotId }) {
     const isTrainedFiles = await prismaClient.filesForBotTraining.findMany({
       where: {
         AND: [
           {
-            slug: slug,
+            chatbotId: chatbotId,
           },
           {
             isFileTrained: true,

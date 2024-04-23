@@ -4,12 +4,12 @@ class SaveChatFlowController {
   async store(req, res, next) {
     try {
       const { latestMessages } = req.body;
-      const slug = req.params.id;
+      const chatbotId = req.params.id;
 
       createSaveOrCreateChatFlowService;
       const service = await createSaveOrCreateChatFlowService.execute({
         latestMessages,
-        slug,
+        chatbotId,
       });
       return res.status(200).json(service);
     } catch (error) {
