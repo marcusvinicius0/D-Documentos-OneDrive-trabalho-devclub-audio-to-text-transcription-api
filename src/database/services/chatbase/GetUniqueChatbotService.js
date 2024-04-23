@@ -2,10 +2,10 @@ import { AppError } from "../../../errors/app.error.js";
 import prismaClient from "../../../prisma/connect.js";
 
 class GetUniqueChatbotService {
-  async execute({ slug }) {
+  async execute({ chatbotId }) {
     const isChatbot = await prismaClient.chatbot.findFirst({
       where: {
-        slug: slug,
+        id: chatbotId,
       },
       select: {
         id: true,
@@ -20,6 +20,8 @@ class GetUniqueChatbotService {
         threadId: true,
         wppSessionStatus: true,
         lastTrainedAt: true,
+        creditMessagesPerMonth: true,
+        subscriptionPlans: true,
         createdAt: true,
         updatedAt: true,
         Files: true,

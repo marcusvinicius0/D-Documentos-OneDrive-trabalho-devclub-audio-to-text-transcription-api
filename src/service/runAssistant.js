@@ -29,8 +29,8 @@ export async function runAssistant(chatbot_id) {
       },
       select: {
         id: true,
-      }
-    })
+      },
+    });
 
     if (!findChatbot) {
       throw new AppError(`Chatbot com o ID ${chatbot_id} não encontrado.`, 404);
@@ -47,7 +47,9 @@ export async function runAssistant(chatbot_id) {
       },
     });
 
-    console.log(`Olá, Sou seu assistente pessoal. Você me deu deu essas instruções:\n${assistantDetails.instructions}`);
+    console.log(
+      `Olá, Sou seu assistente pessoal. Você me deu deu essas instruções:\n${assistantDetails.instructions}`
+    );
 
     const filepath = "./src/utils/chatbot-content.txt";
 
@@ -66,7 +68,9 @@ export async function runAssistant(chatbot_id) {
 
     assistantDetails.files_ids = [...existingFileIds, file.id];
 
-    console.log("O arquivo foi carregado e adicionado com sucesso ao assistente\n");
+    console.log(
+      "O arquivo foi carregado e adicionado com sucesso ao assistente\n"
+    );
 
     const thread = await openai.beta.threads.create();
 
@@ -83,18 +87,15 @@ export async function runAssistant(chatbot_id) {
   }
 }
 
-export async function startChatWithAssistant({
-  currentMessage,
-  chatbotId,
-}) {
+export async function startChatWithAssistant({ currentMessage, chatbotId }) {
   const getAssistantThreadId = await prismaClient.chatbot.findFirst({
     where: {
       id: chatbotId,
     },
     select: {
       threadId: true,
-    }
-  })
+    },
+  });
 
   const getAssistantId = await prismaClient.chatbot.findFirst({
     where: {
@@ -110,25 +111,42 @@ export async function startChatWithAssistant({
     content: currentMessage,
   });
 
-  const run = await openai.beta.threads.runs.create(getAssistantThreadId.threadId, {
-    assistant_id: getAssistantId.assistantId,
-  });
+  const run = await openai.beta.threads.runs.create(
+    getAssistantThreadId.threadId,
+    {
+      assistant_id: getAssistantId.assistantId,
+    }
+  );
 
-  let runStatus = await openai.beta.threads.runs.retrieve(getAssistantThreadId.threadId, run.id);
+  let runStatus = await openai.beta.threads.runs.retrieve(
+    getAssistantThreadId.threadId,
+    run.id
+  );
 
   while (runStatus.status !== "completed") {
     await new Promise((resolve) => setTimeout(resolve, 1000));
-    runStatus = await openai.beta.threads.runs.retrieve(getAssistantThreadId.threadId, run.id);
+    runStatus = await openai.beta.threads.runs.retrieve(
+      getAssistantThreadId.threadId,
+      run.id
+    );
 
     if (["failed", "cancelled", "expired"].includes(runStatus.status)) {
-      console.log(`Status do run é '${runStatus.status}'. Incapaz de completar a requisição.`);
+      console.log(
+        `Status do run é '${runStatus.status}'. Incapaz de completar a requisição.`
+      );
       break;
     }
   }
 
-  const messages = await openai.beta.threads.messages.list(getAssistantThreadId.threadId);
+  const messages = await openai.beta.threads.messages.list(
+    getAssistantThreadId.threadId
+  );
 
-  const lastMessageForRun = messages.data.filter((message) => message.run_id === run.id && message.role === "assistant").pop();
+  const lastMessageForRun = messages.data
+    .filter(
+      (message) => message.run_id === run.id && message.role === "assistant"
+    )
+    .pop();
 
   if (lastMessageForRun) {
     console.log(`${lastMessageForRun.content[0].text.value} \n`);
@@ -138,5 +156,9 @@ export async function startChatWithAssistant({
 
   const response = messages.data[0].content[0].text.value;
 
-  return response;
+  let pattern = /【\d+(:\d+)?(†fonte|†source)】/g;
+
+  let cleanedText = response.replace(pattern, "", response);
+
+  return cleanedText;
 }
