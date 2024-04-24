@@ -15,6 +15,7 @@ class SaveOrCreateChatFlowService {
         userId: true,
         authorEmail: true,
         authorName: true,
+        name: true,
       },
     });
 
@@ -44,7 +45,7 @@ class SaveOrCreateChatFlowService {
           userId: findChatbot.authorEmail,
           chatbotId: findChatbot.id,
           isFiled: false,
-          slug: slug,
+          slug: chatbotId,
         },
       });
     }

@@ -6,6 +6,10 @@ class SaveTextsForTrainingService {
     const isChatbot = await prismaClient.chatbot.findFirst({
       where: {
         id: chatbotId,
+      },
+      select: {
+        id: true,
+        slug: true,
       }
     })
 
