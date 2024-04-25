@@ -5,8 +5,7 @@ class SaveNewAssistantForRetrainingController {
     try {
       const chatbotId = req.params.id;
 
-      // const createRunAssistantForRetraining = await runAssistantForRetraining(chatbotId);
-      const createRunAssistantForRetraining = { ok: true };
+      const createRunAssistantForRetraining = await runAssistantForRetraining(chatbotId);
 
       return res.status(200).json(createRunAssistantForRetraining);
     } catch (error) {

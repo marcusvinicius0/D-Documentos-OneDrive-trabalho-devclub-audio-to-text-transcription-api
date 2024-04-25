@@ -11,19 +11,24 @@ class App {
   constructor() {
     this.app = express();
     this.httpServer = createServer(this.app);
-    this.app.use(cors());
     this.io = new SocketIOServer(this.httpServer, {
       cors: {
         origin: "*",
 
-      handlePreflightRequest: (req, res) => {
+        handlePreflightRequest: (req, res) => {
           res.writeHead(200, {
             "Access-Control-Allow-Origin": "*",
-            "Access-Control-Allow-Methods": ["GET", "POST", "PUT", "PATCH", "DELETE"],
+            "Access-Control-Allow-Methods": [
+              "GET",
+              "POST",
+              "PUT",
+              "PATCH",
+              "DELETE",
+            ],
           });
           res.end();
-        }
-      }
+        },
+      },
     });
     this.configureSocket();
     this.configureApp();
@@ -32,25 +37,6 @@ class App {
   }
 
   configureApp() {
-    this.app.use((req, res, next) => {
-      const allowedOrigins = [
-        "https://chatbotdevclub.netlify.app",
-        "http://localhost:3000",
-        "http://127.0.0.1:5500",
-        "http://localhost:3001",
-      ];
-
-      const origin = req.headers.origin;
-      if (allowedOrigins.includes(origin)) {
-        res.header("Access-Control-Allow-Origin", origin);
-      }
-
-      res.header("Access-Control-Allow-Methods", "POST, GET, PUT, PATCH, OPTIONS, DELETE");
-      res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
-      res.header("Access-Control-Allow-Credentials", true);
-      next();
-    });
-
     this.app.use(express.urlencoded({ extended: true, limit: "3mb" }));
 
     this.app.use((req, res, next) => {
@@ -66,6 +52,7 @@ class App {
   }
 
   middlewares() {
+    this.app.use(cors())
     this.app.use(express.json({ limit: "3mb" }));
   }
 
@@ -75,8 +62,7 @@ class App {
   }
 
   configureSocket() {
-    this.io.on("connection", (socket) => {
-    });
+    this.io.on("connection", (socket) => {});
   }
 }
 
