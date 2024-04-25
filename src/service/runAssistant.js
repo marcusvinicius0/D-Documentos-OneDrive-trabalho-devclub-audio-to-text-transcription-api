@@ -10,16 +10,18 @@ let assistantDetails;
 const secretKey = process.env.OPENAI_KEY;
 const openai = new OpenAI({ apiKey: secretKey });
 
+let assistantConfig = {
+  name: "Dynamic bot",
+  instructions:
+    "I want you to act as a dynamic bot. You will receive instructions and texts for your training, so you need to adapt with these trainings. If the instructions and the texts you received for training is about being a general support, then you will be a general support based on the texts and instructions. And so on. If the questions received is not included in your training data, say exactly: 'Hmm, Eu não tenho certeza, consegue me perguntar de outra forma?'. Refuse to answer any question not about the info. Never answer back the same question the user sent. If the question you received is not included in your database, say exactly: 'Hmm, Eu não tenho certeza, consegue me perguntar de outra forma?'.",
+  tools: [{ type: "retrieval" }],
+  model: "gpt-3.5-turbo",
+};
+
+let filepath = "./src/utils/chatbot-content.txt";
+
 export async function runAssistant(chatbot_id) {
   try {
-    const assistantConfig = {
-      name: "Dynamic bot",
-      instructions:
-        "I want you to act as a dynamic bot. You will receive instructions and texts for your training, so you need to adapt with these trainings. If the instructions and the texts you received for training is about being a general support, then you will be a general support based on the texts and instructions. And so on. If the questions received is not included in your training data, say exactly: 'Hmm, Eu não tenho certeza, consegue me perguntar de outra forma?'. Refuse to answer any question not about the info.",
-      tools: [{ type: "retrieval" }],
-      model: "gpt-3.5-turbo",
-    };
-
     const assistant = await openai.beta.assistants.create(assistantConfig);
     assistantDetails = { assistantId: assistant.id, ...assistantConfig };
 
@@ -33,7 +35,7 @@ export async function runAssistant(chatbot_id) {
     });
 
     if (!findChatbot) {
-      throw new AppError(`Chatbot com o ID ${chatbot_id} não encontrado.`, 404);
+      throw new AppError("Não foi possível encontrar o chatbot.", 404);
     }
 
     const chatbotId = findChatbot.id || "";
@@ -50,8 +52,6 @@ export async function runAssistant(chatbot_id) {
     console.log(
       `Olá, Sou seu assistente pessoal. Você me deu deu essas instruções:\n${assistantDetails.instructions}`
     );
-
-    const filepath = "./src/utils/chatbot-content.txt";
 
     const file = await openai.files.create({
       file: fs.createReadStream(filepath),
@@ -83,7 +83,7 @@ export async function runAssistant(chatbot_id) {
       },
     });
   } catch (error) {
-    console.error(error);
+    console.error("Erro ao configurar e criar assistente: ", error);
   }
 }
 
@@ -161,4 +161,73 @@ export async function startChatWithAssistant({ currentMessage, chatbotId }) {
   let cleanedText = response.replace(pattern, "", response);
 
   return cleanedText;
+}
+
+export async function runAssistantForRetraining(chatId) {
+  try {
+    const findChatbot = await prismaClient.chatbot.findFirst({
+      where: {
+        id: chatId,
+      },
+      select: {
+        id: true,
+        assistantId: true,
+        threadId: true,
+        Files: true,
+        Texts: true,
+        updatedAt: true,
+        lastTrainedAt: true,
+      },
+    });
+
+    if (!findChatbot) {
+      throw new AppError("Não foi possível encontrar o chatbot.", 404);
+    }
+
+    const assistant = await openai.beta.assistants.create(assistantConfig);
+    assistantDetails = { assistantId: assistant.id, ...assistantConfig };
+
+    const chatbotId = findChatbot.id;
+
+    await prismaClient.chatbot.update({
+      where: {
+        id: chatbotId,
+      },
+      data: {
+        assistantId: assistant.id,
+      },
+    });
+
+    const files = findChatbot.Files.map((file) => file.message).join("\n");
+    const texts = findChatbot.Texts.map((text) => text.text).join("\n");
+    const combinedFileText = files + texts;
+
+    const file = await openai.files.create({
+      file: fs.createReadStream(combinedFileText),
+      purpose: "assistants",
+    });
+
+    let existingFileIds = assistantDetails.files_ids || [];
+
+    await openai.beta.assistants.update(assistantDetails.assistantId, {
+      file_ids: [...existingFileIds, file.id],
+    });
+
+    assistantDetails.files_ids = [...existingFileIds, file.id];
+
+    console.log("O arquivo foi carregado e adicionado com sucesso ao assistente\n");
+
+    const thread = await openai.beta.threads.create();
+
+    await prismaClient.chatbot.update({
+      where: {
+        id: chatbotId,
+      },
+      data: {
+        threadId: thread.id,
+      },
+    });
+  } catch (error) {
+    console.error("Erro ao configurar e criar assistente: ", error);
+  }
 }

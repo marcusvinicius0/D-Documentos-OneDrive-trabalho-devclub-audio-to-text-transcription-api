@@ -1,7 +1,7 @@
 import { AppError } from "../../../errors/app.error.js";
 import prismaClient from "../../../prisma/connect.js";
 
-class SaveFilesForTrainingService {
+class SaveNewFilesForRetrainingService {
   async execute({ texts, chatbotId }) {
     const isChatbot = await prismaClient.chatbot.findFirst({
       where: {
@@ -32,9 +32,9 @@ class SaveFilesForTrainingService {
           isFileTrained: true,
           messageLength: message_length,
           slug: isChatbot.slug,
-        },
-      });
-    });
+        }
+      })
+    })
 
     try {
       await prismaClient.$transaction(createPromises);
@@ -46,4 +46,4 @@ class SaveFilesForTrainingService {
   }
 }
 
-export { SaveFilesForTrainingService };
+export { SaveNewFilesForRetrainingService };
