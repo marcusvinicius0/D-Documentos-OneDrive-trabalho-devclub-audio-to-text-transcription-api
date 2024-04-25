@@ -14,7 +14,7 @@ class App {
     this.app.use(cors());
     this.io = new SocketIOServer(this.httpServer, {
       cors: {
-        origin: ["*"],
+        origin: "*",
 
       handlePreflightRequest: (req, res) => {
           res.writeHead(200, {

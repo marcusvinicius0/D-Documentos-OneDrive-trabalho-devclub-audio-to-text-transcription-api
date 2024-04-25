@@ -7,7 +7,9 @@ import { GetTrainedTextsService } from "../database/services/chatbase/GetTrained
 import { GetUniqueChatbotService } from "../database/services/chatbase/GetUniqueChatbotService.js";
 import { SaveFilesForTrainingService } from "../database/services/chatbase/SaveFilesForTrainingService.js";
 import { SaveNewChatbotService } from "../database/services/chatbase/SaveNewChatbotService.js";
+import { SaveNewFilesForRetrainingService } from "../database/services/chatbase/SaveNewFilesForRetrainingService.js";
 import { SaveOrCreateChatFlowService } from "../database/services/chatbase/SaveOrCreateChatFlowService.js";
+import { SaveTextsForRetrainingService } from "../database/services/chatbase/SaveTextForRetrainingService.js";
 import { SaveTextsForTrainingService } from "../database/services/chatbase/SaveTextsForTrainingService.js";
 import { CheckOrCreateUserService } from "../database/services/user/CheckOrCreateUserService.js";
 
@@ -15,6 +17,8 @@ export const createSaveNewChatbotService = new SaveNewChatbotService();
 export const createSaveFilesForTrainingService = new SaveFilesForTrainingService();
 export const createSaveTextsForTrainingService = new SaveTextsForTrainingService();
 export const createDeleteChatbotService = new DeleteChatbotService();
+export const createSaveFilesForRetrainingService = new SaveNewFilesForRetrainingService();
+export const createSaveTextForRetrainingService = new SaveTextsForRetrainingService();
 
 export const createSaveOrCreateChatFlowService = new SaveOrCreateChatFlowService();
 export const createGetChatHistoryService = new GetChatHistoryService();
