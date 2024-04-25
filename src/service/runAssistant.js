@@ -202,10 +202,16 @@ export async function runAssistantForRetraining(chatId) {
     const texts = findChatbot.Texts.map((text) => text.text).join("\n");
     const combinedFileText = files + texts;
 
+    fs.writeFileSync(filepath, JSON.stringify(combinedFileText, null, 2), {
+      encoding: "utf-8"
+    });
+
     const file = await openai.files.create({
-      file: fs.createReadStream(combinedFileText),
+      file: fs.createReadStream(filepath),
       purpose: "assistants",
     });
+
+    fs.writeFileSync(filepath, "");
 
     let existingFileIds = assistantDetails.files_ids || [];
 
