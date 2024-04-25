@@ -20,6 +20,7 @@ import { UpdateChatbotWithFilesController } from "./controllers/chatbase/chatbot
 import { UpdateChatbotWithTextController } from "./controllers/chatbase/chatbot/UpdateChatbotWithTextController.js";
 import { DeleteChatbotController } from "./controllers/chatbase/chatbot/DeleteChatbotController.js";
 import { SaveNewAssistantController } from "./controllers/chatbase/chatbot/SaveNewAssistantController.js";
+import { SaveNewAssistantForRetrainingController } from "./controllers/chatbase/chatbot/SaveNewAssistantForRetrainingController.js";
 
 const routes = new Router();
 const multer_config = multer();
@@ -46,13 +47,14 @@ routes.post("/chatbot/files-for-training/:id", multer_config.array("files"), new
 routes.post("/chatbot/texts-for-training/:id", new SaveTextsForTraningController().store);
 routes.delete("/chatbot/delete/:id", new DeleteChatbotController().delete);
 routes.post("/chatbot/new/assistant/:id", new SaveNewAssistantController().store);
+routes.post("/chatbot/retrain-assistant/:id", new SaveNewAssistantForRetrainingController().store);
 
 routes.get("/chatbots/:id", new GetChatbotsController().index);
 routes.get("/chatbot/:id", new GetUniqueChatbotController().show);
 routes.get("/chatbot/files-for-training/:id", new GetTrainedFilesController().index);
 routes.get("/chatbot/texts-for-training/:id", new GetTrainedTextsController().index);
-routes.put("/chatbot/files-retraining/:id", new UpdateChatbotWithFilesController().update);
-routes.put("/chatbot/texts-retraining/:id", new UpdateChatbotWithTextController().update);
+routes.post("/chatbot/files-retraining/:id", multer_config.array("files-retraining"),  new UpdateChatbotWithFilesController().store);
+routes.post("/chatbot/texts-retraining/:id", new UpdateChatbotWithTextController().store);
 
 routes.post("/chatbot/chat-session/:id", new ChatSessionFlowController().store);
 routes.post("/chatbot/save-chatflow/:id", new SaveChatFlowController().store);
