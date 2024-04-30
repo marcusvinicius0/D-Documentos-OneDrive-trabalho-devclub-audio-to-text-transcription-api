@@ -3,10 +3,9 @@ import { runAssistant } from "../../../service/runAssistant.js";
 class SaveNewAssistantController {
   async store(req, res, next) {
     try {
-      const { chatbot_id } = req.body;
+      const chatbot = req.body;
 
-      const createRunAssistant = await runAssistant(chatbot_id);
-
+      const createRunAssistant = await runAssistant(chatbot);
       return res.status(201).json(createRunAssistant);
     } catch (error) {
       next(error)
