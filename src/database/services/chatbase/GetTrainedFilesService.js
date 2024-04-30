@@ -4,6 +4,9 @@ import prismaClient from "../../../prisma/connect.js";
 class GetTrainedFilesService {
   async execute({ chatbotId }) {
     const isTrainedFiles = await prismaClient.filesForBotTraining.findMany({
+      orderBy: {
+        createdAt: 'desc',
+      },
       where: {
         AND: [
           {

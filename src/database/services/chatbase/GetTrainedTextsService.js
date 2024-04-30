@@ -4,6 +4,9 @@ import prismaClient from "../../../prisma/connect.js";
 class GetTrainedTextsService {
   async execute({ chatbotId }) {
     const isTrainedTexts = await prismaClient.textsForBotTraining.findMany({
+      orderBy: {
+        createdAt: 'desc',
+      },
       where: {
         AND: [
           {
