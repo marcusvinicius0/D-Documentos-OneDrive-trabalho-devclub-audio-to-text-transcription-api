@@ -18,6 +18,9 @@ class GetChatHistoryService {
     const session_id = findUserChatSession.id;
 
     const getChatHistory = await prismaClient.chatbotMessages.findMany({
+      orderBy: {
+        createdAt: 'desc',
+      },
       where: {
         chatSessionId: session_id,
       },
