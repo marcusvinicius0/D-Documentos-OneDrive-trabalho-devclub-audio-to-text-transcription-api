@@ -5,7 +5,6 @@ import "dotenv/config";
 
 import routes from "./routes.js";
 import { errorHandler } from "./middlewares/error-handler.middleware.js";
-import cors from "cors";
 
 class App {
   constructor() {
@@ -13,11 +12,11 @@ class App {
     this.httpServer = createServer(this.app);
     this.io = new SocketIOServer(this.httpServer, {
       cors: {
-        origin: "*",
+        origin: ["http://localhost:3000", "https://chatbotdevclub.netlify.app/", "https://chatbotclub.com.br", "https://chatbotclub.netlify.app"],
 
         handlePreflightRequest: (req, res) => {
           res.writeHead(200, {
-            "Access-Control-Allow-Origin": "*",
+            "Access-Control-Allow-Origin": "https://chatbotclub.com.br",
             "Access-Control-Allow-Methods": [
               "GET",
               "POST",
@@ -30,6 +29,12 @@ class App {
         },
       },
     });
+    this.app.use((req, res, next) => {
+      res.header("Access-Control-Allow-Origin", "*");
+      res.header("Access-Control-Allow-Methods", ["POST", "GET", "PUT", "PATCH", "OPTIONS", "DELETE"]);
+      res.header("Access-Control-Allow-Headers", "Content-Type, Authorization")
+      next();
+    })
     this.configureSocket();
     this.configureApp();
     this.middlewares();
@@ -52,7 +57,6 @@ class App {
   }
 
   middlewares() {
-    this.app.use(cors())
     this.app.use(express.json({ limit: "3mb" }));
   }
 

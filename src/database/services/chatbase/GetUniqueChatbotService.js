@@ -22,6 +22,8 @@ class GetUniqueChatbotService {
         lastTrainedAt: true,
         creditMessagesPerMonth: true,
         subscriptionPlans: true,
+        instructions: true,
+        temperature: true,
         createdAt: true,
         updatedAt: true,
         Files: true,

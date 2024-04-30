@@ -2,8 +2,8 @@ import { AppError } from "../../../errors/app.error.js";
 import prismaClient from "../../../prisma/connect.js";
 
 class SaveNewChatbotService {
-  async execute({ authorEmail, authorName, chatbotName }) {
-    if (!authorEmail || !authorName) {
+  async execute(chatbot) {
+    if (!chatbot.authorEmail || !chatbot.authorName) {
       throw new AppError(
         "Você não tem permissão para rodar esse serviço.",
         401
@@ -12,10 +12,12 @@ class SaveNewChatbotService {
 
     const chatbotDataStructure = {
       model: "gpt-3.5-turbo",
-      authorEmail: authorEmail,
-      authorName: authorName,
-      chatbotName: chatbotName,
-      slug: chatbotName,
+      authorEmail: chatbot.authorEmail,
+      authorName: chatbot.authorName,
+      chatbotName: chatbot.name,
+      slug: chatbot.name,
+      instructions: chatbot.instructions,
+      temperature: chatbot.temperature,
     };
 
     const isChatbotSameName = await prismaClient.chatbot.findFirst({
@@ -23,12 +25,12 @@ class SaveNewChatbotService {
         AND: [
           {
             name: {
-              equals: chatbotName,
+              equals: chatbot.name,
               mode: "insensitive",
             },
           },
           {
-            authorEmail: chatbotDataStructure.authorEmail,
+            authorEmail: chatbot.authorEmail,
           },
         ],
       },
@@ -45,7 +47,7 @@ class SaveNewChatbotService {
 
     const findUser = await prismaClient.user.findFirst({
       where: {
-        email: authorEmail,
+        email: chatbot.authorEmail,
       },
       select: {
         id: true,
@@ -60,6 +62,8 @@ class SaveNewChatbotService {
         name: chatbotDataStructure.chatbotName,
         slug: chatbotDataStructure.slug,
         userId: findUser.id,
+        instructions: chatbotDataStructure.instructions,
+        temperature: chatbotDataStructure.temperature,
       },
       select: {
         id: true,

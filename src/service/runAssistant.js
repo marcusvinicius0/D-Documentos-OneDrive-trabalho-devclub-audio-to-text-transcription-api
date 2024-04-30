@@ -10,24 +10,26 @@ let assistantDetails;
 const secretKey = process.env.OPENAI_KEY;
 const openai = new OpenAI({ apiKey: secretKey });
 
-let assistantConfig = {
-  name: "Dynamic bot",
-  instructions:
-    "I want you to act as a dynamic bot. You will receive instructions and texts for your training, so you need to adapt with these trainings. If the instructions and the texts you received for training is about being a general support, then you will be a general support based on the texts and instructions. And so on. If the questions received is not included in your training data, say exactly: 'Hmm, Eu não tenho certeza, consegue me perguntar de outra forma?'. Refuse to answer any question not about the info. Never answer back the same question the user sent. If the question you received is not included in your database, say exactly: 'Hmm, Eu não tenho certeza, consegue me perguntar de outra forma?'.",
-  tools: [{ type: "retrieval" }],
-  model: "gpt-3.5-turbo",
-};
+let patternInstructions = "I want you to act as a dynamic bot. You will receive instructions and texts for your training, so you need to adapt with these trainings. If the instructions and the texts you received for training is about being a general support, then you will be a general support based on the texts and instructions. And so on. If the questions received is not included in your training data, say exactly: 'Hmm, Eu não tenho certeza, consegue me perguntar de outra forma?'. Refuse to answer any question not about the info. Never answer back the same question the user sent. If the question you received is not included in your database, say exactly: 'Hmm, Eu não tenho certeza, consegue me perguntar de outra forma?'. Never answer 'According to the information provided' or 'According to the content provided' or 'According to the text provided'.";
 
 let filepath = "./src/utils/chatbot-content.txt";
 
-export async function runAssistant(chatbot_id) {
+export async function runAssistant(chatbot) {
   try {
-    const assistant = await openai.beta.assistants.create(assistantConfig);
-    assistantDetails = { assistantId: assistant.id, ...assistantConfig };
+    const assistantConfigForTrain = {
+      name: chatbot.name,
+      instructions: chatbot.instructions ? chatbot.instructions : patternInstructions,
+      tools: [{ type: "retrieval" }],
+      model: "gpt-3.5-turbo",
+      temperature: chatbot.temperature,
+    };
+
+    const assistant = await openai.beta.assistants.create(assistantConfigForTrain);
+    assistantDetails = { assistantId: assistant.id, ...assistantConfigForTrain };
 
     const findChatbot = await prismaClient.chatbot.findFirst({
       where: {
-        id: chatbot_id,
+        id: chatbot.id,
       },
       select: {
         id: true,
@@ -173,6 +175,9 @@ export async function runAssistantForRetraining(chatId) {
         id: true,
         assistantId: true,
         threadId: true,
+        name: true,
+        instructions: true,
+        temperature: true,
         Files: true,
         Texts: true,
         updatedAt: true,
@@ -183,9 +188,16 @@ export async function runAssistantForRetraining(chatId) {
     if (!findChatbot) {
       throw new AppError("Não foi possível encontrar o chatbot.", 404);
     }
+    const assistantConfigForRetrain = {
+      name: findChatbot.name,
+      instructions: findChatbot.instructions,
+      tools: [{ type: "retrieval" }],
+      model: "gpt-3.5-turbo",
+      temperature: findChatbot.temperature,
+    }
 
-    const assistant = await openai.beta.assistants.create(assistantConfig);
-    assistantDetails = { assistantId: assistant.id, ...assistantConfig };
+    const assistant = await openai.beta.assistants.create(assistantConfigForRetrain);
+    assistantDetails = { assistantId: assistant.id, ...assistantConfigForRetrain };
 
     const chatbotId = findChatbot.id;
 
@@ -195,6 +207,7 @@ export async function runAssistantForRetraining(chatId) {
       },
       data: {
         assistantId: assistant.id,
+        lastTrainedAt: new Date(),
       },
     });
 
