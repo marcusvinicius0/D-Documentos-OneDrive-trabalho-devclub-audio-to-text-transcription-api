@@ -4,6 +4,9 @@ import prismaClient from "../../../prisma/connect.js";
 class GetChatbotsService {
   async execute({ userEmail }) {
     const isChatbot = await prismaClient.chatbot.findMany({
+      orderBy: {
+        createdAt: 'desc',
+      },
       where: {
         authorEmail: userEmail,
       },

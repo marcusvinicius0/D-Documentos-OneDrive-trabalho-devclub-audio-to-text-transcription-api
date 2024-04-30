@@ -16,9 +16,11 @@ let filepath = "./src/utils/chatbot-content.txt";
 
 export async function runAssistant(chatbot) {
   try {
+    let instructions = chatbot.instructions ? chatbot.instructions : patternInstructions;
+
     const assistantConfigForTrain = {
       name: chatbot.name,
-      instructions: chatbot.instructions ? chatbot.instructions : patternInstructions,
+      instructions: instructions,
       tools: [{ type: "retrieval" }],
       model: "gpt-3.5-turbo",
       temperature: chatbot.temperature,
@@ -48,6 +50,7 @@ export async function runAssistant(chatbot) {
       },
       data: {
         assistantId: assistant.id,
+        instructions: instructions,
       },
     });
 
