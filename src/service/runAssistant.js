@@ -143,15 +143,9 @@ export async function startChatWithAssistant({ currentMessage, chatbotId }) {
     }
   }
 
-  const messages = await openai.beta.threads.messages.list(
-    getAssistantThreadId.threadId
-  );
+  const messages = await openai.beta.threads.messages.list(getAssistantThreadId.threadId);
 
-  const lastMessageForRun = messages.data
-    .filter(
-      (message) => message.run_id === run.id && message.role === "assistant"
-    )
-    .pop();
+  const lastMessageForRun = messages.data.filter((message) => message.run_id === run.id && message.role === "assistant").pop();
 
   if (lastMessageForRun) {
     console.log(`${lastMessageForRun.content[0].text.value} \n`);

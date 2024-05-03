@@ -3,8 +3,8 @@ import prismaClient from "../../../prisma/connect.js";
 
 class SaveOrCreateChatFlowService {
   async execute({ latestMessages, chatbotId }) {
-    const author = latestMessages[0];
-    const bot = latestMessages[1];
+    let author = latestMessages[0];
+    let bot = latestMessages[1];
 
     const findChatbot = await prismaClient.chatbot.findFirst({
       where: {
@@ -68,25 +68,17 @@ class SaveOrCreateChatFlowService {
 
     const chat_session_id = getSessionCreated.id;
 
-    const saveChatFlow = await prismaClient.chatbotMessages.create({
+    await prismaClient.chatbotMessages.create({
       data: {
         chatSessionId: chat_session_id,
         sender: author,
         bot: bot,
+        messages: [author, bot],
         isFiled: false,
-      },
-      select: {
-        id: true,
-        chatSessionId: true,
-        sender: true,
-        bot: true,
-        isFiled: true,
-        createdAt: true,
-        updatedAt: true,
       },
     });
 
-    return saveChatFlow;
+    return { ok: true };
   }
 }
 
