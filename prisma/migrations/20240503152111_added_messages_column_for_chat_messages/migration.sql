@@ -1,0 +1,10 @@
+-- AlterTable
+ALTER TABLE "chatbot-messages" ADD COLUMN     "messages" JSONB[] DEFAULT ARRAY[]::JSONB[];
+
+-- AlterTable
+ALTER TABLE "user" ADD COLUMN     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+ADD COLUMN     "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP;
+
+-- AlterTable
+ALTER TABLE "user-chatbot" ADD COLUMN     "instructions" TEXT NOT NULL DEFAULT '',
+ADD COLUMN     "temperature" DOUBLE PRECISION NOT NULL DEFAULT 0.5;

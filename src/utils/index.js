@@ -16,7 +16,6 @@ export async function sendMessagesWithDelay({
     client
       .sendText(targetNumber, msg.trimStart())
       .then((result) => {
-        console.log("Mensagem enviada:", result.body);
       })
       .catch((error) => {
         console.error("Erro ao enviar mensagem:", error);
