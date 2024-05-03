@@ -58,7 +58,7 @@ model User {
   Chatbot   Chatbot? @relation(fields: [chatbotId], references: [id])
 
   createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
 
   @@map("user")
 }
@@ -118,6 +118,7 @@ model ChatbotMessages {
   chatSessionId String
   sender        Json
   bot           Json
+  messages      Json[]      @default([])
   isFiled       Boolean     @default(false)
   ChatSession   ChatSession @relation(fields: [chatSessionId], references: [id])
 
