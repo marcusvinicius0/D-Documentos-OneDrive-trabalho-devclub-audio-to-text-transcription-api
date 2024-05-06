@@ -1,8 +1,10 @@
 import OpenAI from "openai";
 import dotenv from "dotenv";
 import fs from "fs";
+
 import prismaClient from "../prisma/connect.js";
 import { AppError } from "../errors/app.error.js";
+import { patternAssistantInstructions } from "../utils/index.js";
 
 dotenv.config();
 
@@ -10,24 +12,29 @@ let assistantDetails;
 const secretKey = process.env.OPENAI_KEY;
 const openai = new OpenAI({ apiKey: secretKey });
 
-let patternInstructions = "I want you to act as a dynamic bot. You will receive instructions and texts for your training, so you need to adapt with these trainings. If the instructions and the texts you received for training is about being a general support, then you will be a general support based on the texts and instructions. And so on. If the questions received is not included in your training data, say exactly: 'Hmm, Eu não tenho certeza, consegue me perguntar de outra forma?'. Refuse to answer any question not about the info. Never answer back the same question the user sent. If the question you received is not included in your database, say exactly: 'Hmm, Eu não tenho certeza, consegue me perguntar de outra forma?'. Never answer 'According to the information provided' or 'According to the content provided' or 'According to the text provided'.";
-
 let filepath = "./src/utils/chatbot-content.txt";
 
 export async function runAssistant(chatbot) {
   try {
-    let instructions = chatbot.instructions ? chatbot.instructions : patternInstructions;
+    let instructions = chatbot.instructions
+      ? chatbot.instructions
+      : patternAssistantInstructions();
 
     const assistantConfigForTrain = {
       name: chatbot.name,
       instructions: instructions,
-      tools: [{ type: "retrieval" }],
+      tools: [{ type: "file_search" }],
       model: "gpt-3.5-turbo",
       temperature: chatbot.temperature,
     };
 
-    const assistant = await openai.beta.assistants.create(assistantConfigForTrain);
-    assistantDetails = { assistantId: assistant.id, ...assistantConfigForTrain };
+    const assistant = await openai.beta.assistants.create(
+      assistantConfigForTrain
+    );
+    assistantDetails = {
+      assistantId: assistant.id,
+      ...assistantConfigForTrain,
+    };
 
     const findChatbot = await prismaClient.chatbot.findFirst({
       where: {
@@ -102,6 +109,8 @@ export async function startChatWithAssistant({ currentMessage, chatbotId }) {
     },
   });
 
+  const threadId = getAssistantThreadId.threadId;
+
   const getAssistantId = await prismaClient.chatbot.findFirst({
     where: {
       id: chatbotId,
@@ -111,29 +120,45 @@ export async function startChatWithAssistant({ currentMessage, chatbotId }) {
     },
   });
 
-  await openai.beta.threads.messages.create(getAssistantThreadId.threadId, {
+  await openai.beta.threads.messages.create(threadId, {
     role: "user",
     content: currentMessage,
   });
 
-  const run = await openai.beta.threads.runs.create(
-    getAssistantThreadId.threadId,
-    {
+  const run = await openai.beta.threads.runs
+    .create(threadId, {
       assistant_id: getAssistantId.assistantId,
-    }
-  );
+    })
+    // .on("textCreated", (text) => process.stdout.write("\nassistant > "))
+    // .on("textDelta", (textDelta, snapshot) =>
+    //   process.stdout.write(textDelta.value)
+    // )
+    // .on("toolCallCreated", (toolCall) =>
+    //   process.stdout.write(`\nassistant > ${toolCall.type}\n\n`)
+    // )
+    // .on("toolCallDelta", (toolCallDelta, snapshot) => {
+    //   if (toolCallDelta.type === "code_interpreter") {
+    //     if (toolCallDelta.code_interpreter.input) {
+    //       process.stdout.write(toolCallDelta.code_interpreter.input);
+    //     }
+    //     if (toolCallDelta.code_interpreter.outputs) {
+    //       process.stdout.write("\noutput >\n");
+    //       toolCallDelta.code_interpreter.outputs.forEach((output) => {
+    //         if (output.type === "logs") {
+    //           process.stdout.write(`\n${output.logs}\n`);
+    //         }
+    //       });
+    //     }
+    //   }
+    // });
 
-  let runStatus = await openai.beta.threads.runs.retrieve(
-    getAssistantThreadId.threadId,
-    run.id
-  );
+  let runStatus = await openai.beta.threads.runs.retrieve(threadId, run.id);
+
+  console.log("RUN STATUS: ", runStatus);
 
   while (runStatus.status !== "completed") {
     await new Promise((resolve) => setTimeout(resolve, 1000));
-    runStatus = await openai.beta.threads.runs.retrieve(
-      getAssistantThreadId.threadId,
-      run.id
-    );
+    runStatus = await openai.beta.threads.runs.retrieve(threadId, run.id);
 
     if (["failed", "cancelled", "expired"].includes(runStatus.status)) {
       console.log(
@@ -143,9 +168,15 @@ export async function startChatWithAssistant({ currentMessage, chatbotId }) {
     }
   }
 
-  const messages = await openai.beta.threads.messages.list(getAssistantThreadId.threadId);
+  const messages = await openai.beta.threads.messages.list(
+    getAssistantThreadId.threadId
+  );
 
-  const lastMessageForRun = messages.data.filter((message) => message.run_id === run.id && message.role === "assistant").pop();
+  const lastMessageForRun = messages.data
+    .filter(
+      (message) => message.run_id === run.id && message.role === "assistant"
+    )
+    .pop();
 
   if (lastMessageForRun) {
     console.log(`${lastMessageForRun.content[0].text.value} \n`);
@@ -188,13 +219,18 @@ export async function runAssistantForRetraining(chatId) {
     const assistantConfigForRetrain = {
       name: findChatbot.name,
       instructions: findChatbot.instructions,
-      tools: [{ type: "retrieval" }],
+      tools: [{ type: "file_search" }],
       model: "gpt-3.5-turbo",
       temperature: findChatbot.temperature,
-    }
+    };
 
-    const assistant = await openai.beta.assistants.create(assistantConfigForRetrain);
-    assistantDetails = { assistantId: assistant.id, ...assistantConfigForRetrain };
+    const assistant = await openai.beta.assistants.create(
+      assistantConfigForRetrain
+    );
+    assistantDetails = {
+      assistantId: assistant.id,
+      ...assistantConfigForRetrain,
+    };
 
     const chatbotId = findChatbot.id;
 
@@ -213,7 +249,7 @@ export async function runAssistantForRetraining(chatId) {
     const combinedFileText = files + texts;
 
     fs.writeFileSync(filepath, JSON.stringify(combinedFileText, null, 2), {
-      encoding: "utf-8"
+      encoding: "utf-8",
     });
 
     const file = await openai.files.create({
@@ -231,7 +267,9 @@ export async function runAssistantForRetraining(chatId) {
 
     assistantDetails.files_ids = [...existingFileIds, file.id];
 
-    console.log("O arquivo foi carregado e adicionado com sucesso ao assistente\n");
+    console.log(
+      "O arquivo foi carregado e adicionado com sucesso ao assistente\n"
+    );
 
     const thread = await openai.beta.threads.create();
 
@@ -245,5 +283,19 @@ export async function runAssistantForRetraining(chatId) {
     });
   } catch (error) {
     console.error("Erro ao configurar e criar assistente: ", error);
+  }
+}
+
+export async function deleteAssistant(assistantId) {
+  try {
+    if (!assistantId) {
+      throw new AppError("Nenhuma credencial foi encontrada.", 401);
+    }
+
+    const response = await openai.beta.assistants.del(assistantId);
+
+    return response;
+  } catch (error) {
+    console.error("Erro ao deletar assistente: ", error);
   }
 }
