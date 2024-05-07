@@ -23,7 +23,7 @@ export async function runAssistant(chatbot) {
     const assistantConfigForTrain = {
       name: chatbot.name,
       instructions: instructions,
-      tools: [{ type: "file_search" }],
+      tools: [{ type: "retrieval" }],
       model: "gpt-3.5-turbo",
       temperature: chatbot.temperature,
     };
@@ -129,32 +129,9 @@ export async function startChatWithAssistant({ currentMessage, chatbotId }) {
     .create(threadId, {
       assistant_id: getAssistantId.assistantId,
     })
-    // .on("textCreated", (text) => process.stdout.write("\nassistant > "))
-    // .on("textDelta", (textDelta, snapshot) =>
-    //   process.stdout.write(textDelta.value)
-    // )
-    // .on("toolCallCreated", (toolCall) =>
-    //   process.stdout.write(`\nassistant > ${toolCall.type}\n\n`)
-    // )
-    // .on("toolCallDelta", (toolCallDelta, snapshot) => {
-    //   if (toolCallDelta.type === "code_interpreter") {
-    //     if (toolCallDelta.code_interpreter.input) {
-    //       process.stdout.write(toolCallDelta.code_interpreter.input);
-    //     }
-    //     if (toolCallDelta.code_interpreter.outputs) {
-    //       process.stdout.write("\noutput >\n");
-    //       toolCallDelta.code_interpreter.outputs.forEach((output) => {
-    //         if (output.type === "logs") {
-    //           process.stdout.write(`\n${output.logs}\n`);
-    //         }
-    //       });
-    //     }
-    //   }
-    // });
 
-  let runStatus = await openai.beta.threads.runs.retrieve(threadId, run.id);
 
-  console.log("RUN STATUS: ", runStatus);
+    let runStatus = await openai.beta.threads.runs.retrieve(threadId, run.id);
 
   while (runStatus.status !== "completed") {
     await new Promise((resolve) => setTimeout(resolve, 1000));
@@ -219,7 +196,7 @@ export async function runAssistantForRetraining(chatId) {
     const assistantConfigForRetrain = {
       name: findChatbot.name,
       instructions: findChatbot.instructions,
-      tools: [{ type: "file_search" }],
+      tools: [{ type: "retrieval" }],
       model: "gpt-3.5-turbo",
       temperature: findChatbot.temperature,
     };
