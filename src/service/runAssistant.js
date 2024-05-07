@@ -10,7 +10,7 @@ dotenv.config();
 
 let assistantDetails;
 const secretKey = process.env.OPENAI_KEY;
-const openai = new OpenAI({ apiKey: secretKey, defaultHeaders: {"OpenAI-Beta": "assistants=v1" }});
+const openai = new OpenAI({ apiKey: secretKey });
 
 let filepath = "./src/utils/chatbot-content.txt";
 
