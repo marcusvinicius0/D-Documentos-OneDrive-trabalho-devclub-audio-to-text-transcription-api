@@ -1,5 +1,6 @@
 import { AppError } from "../../../errors/app.error.js";
 import prismaClient from "../../../prisma/connect.js";
+import { deleteAssistant } from "../../../service/runAssistant.js";
 
 class DeleteChatbotService {
   async execute({ chatbotId, email }) {
@@ -17,6 +18,7 @@ class DeleteChatbotService {
       select: {
         id: true,
         name: true,
+        assistantId: true,
       },
     });
 
@@ -95,6 +97,8 @@ class DeleteChatbotService {
         },
       });
     }
+
+    await deleteAssistant(findChatbot.assistantId);
 
     const deleteChatbot = await prismaClient.chatbot.delete({
       where: {
