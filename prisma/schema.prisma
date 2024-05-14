@@ -122,6 +122,7 @@ model ChatbotMessages {
   messages      Json[]      @default([])
   isFiled       Boolean     @default(false)
   ChatSession   ChatSession @relation(fields: [chatSessionId], references: [id])
+  isChatWidget  Boolean     @default(false)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

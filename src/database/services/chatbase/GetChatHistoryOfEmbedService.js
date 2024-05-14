@@ -2,7 +2,6 @@ import prismaClient from "../../../prisma/connect.js";
 
 class GetChatHistoryOfEmbedService {
   async execute({ chatbotId }) {
-
     const findUserChatSessionWidget = await prismaClient.chatSession.findFirst({
       where: {
         AND: [
@@ -30,7 +29,14 @@ class GetChatHistoryOfEmbedService {
         createdAt: "asc",
       },
       where: {
-        chatSessionId: sessionId,
+        AND: [
+          {
+            chatSessionId: sessionId,
+          },
+          {
+            isChatWidget: true,
+          }
+        ]
       },
       select: {
         id: true,
