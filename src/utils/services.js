@@ -1,5 +1,6 @@
 import { DeleteChatHistoryService } from "../database/services/chatbase/DeleteChatHistoryService.js";
 import { DeleteChatbotService } from "../database/services/chatbase/DeleteChatbotService.js";
+import { GetChatHistoryOfEmbedService } from "../database/services/chatbase/GetChatHistoryOfEmbedService.js";
 import { GetChatHistoryService } from "../database/services/chatbase/GetChatHistoryService.js";
 import { GetChatbotsService } from "../database/services/chatbase/GetChatbotsService.js";
 import { GetTrainedFilesService } from "../database/services/chatbase/GetTrainedFilesService.js";
@@ -27,5 +28,6 @@ export const createGetChatbotsService = new GetChatbotsService();
 export const createGetUniqueChatbotService = new GetUniqueChatbotService();
 export const createGetTrainedFilesService = new GetTrainedFilesService();
 export const createGetTrainedTextsService = new GetTrainedTextsService();
+export const createGetChatHistoryOfEmbedService = new GetChatHistoryOfEmbedService();
 
 export const createCheckOrCreateUserService = new CheckOrCreateUserService();
