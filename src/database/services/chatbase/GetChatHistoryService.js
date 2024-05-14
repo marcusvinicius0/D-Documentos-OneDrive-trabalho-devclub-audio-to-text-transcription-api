@@ -1,5 +1,5 @@
 import prismaClient from "../../../prisma/connect.js";
-
+import { AppError } from "../../../errors/app.error.js";
 class GetChatHistoryService {
   async execute({ chatbotIdentification }) {
     const findUserChatSession = await prismaClient.chatSession.findFirst({
@@ -10,8 +10,8 @@ class GetChatHistoryService {
           },
           {
             isChatWidget: false,
-          }
-        ]
+          },
+        ],
       },
       select: {
         id: true,
@@ -19,17 +19,20 @@ class GetChatHistoryService {
     });
 
     if (!findUserChatSession) {
-      return [];
+      throw new AppError(
+        "Não foi possível encontrar uma sessão de chat. ",
+        404
+      );
     }
 
-    const session_id = findUserChatSession.id;
+    const sessionId = findUserChatSession.id;
 
     const getChatFlow = await prismaClient.chatbotMessages.findMany({
       orderBy: {
         createdAt: "asc",
       },
       where: {
-        chatSessionId: session_id,
+        chatSessionId: sessionId,
       },
       select: {
         id: true,
@@ -38,14 +41,15 @@ class GetChatHistoryService {
         bot: true,
         messages: true,
         isFiled: true,
+        isChatWidget: true,
         createdAt: true,
         updatedAt: true,
       },
     });
 
-    const allMessages = [].concat(...getChatFlow.map(chat => chat.messages));
+    const allMessages = [].concat(...getChatFlow.map((chat) => chat.messages));
 
-    return allMessages;
+    return allMessages || [];
   }
 }
 

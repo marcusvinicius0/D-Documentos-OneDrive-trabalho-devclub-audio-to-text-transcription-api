@@ -5,7 +5,6 @@ class GetChatHistoryOfEmbedController {
     try {
       const chatbotId = req.params.id;
 
-      console.log("chatbotId: ", chatbotId);
       createGetChatHistoryOfEmbedService;
       const service = await createGetChatHistoryOfEmbedService.execute({
         chatbotId,

@@ -13,7 +13,6 @@ class SaveChatFlowController {
         isChatWidget,
       });
       return res.status(200).json(service);
-      return res.status(200).json({ ok: true });
     } catch (error) {
       next(error);
     }

@@ -78,67 +78,69 @@ class SaveOrCreateChatFlowService {
           sender: author,
           bot: bot,
           messages: [author, bot],
+          isChatWidget: true,
           isFiled: false,
         },
       });
-    }
+    } else {
+      const isSessionActive = await prismaClient.chatSession.findFirst({
+        where: {
+          AND: [
+            {
+              chatbotId: findChatbot.id,
+            },
+            {
+              isFiled: false,
+            },
+          ],
+        },
+        select: {
+          id: true,
+        },
+      });
 
-    const isSessionActive = await prismaClient.chatSession.findFirst({
-      where: {
-        AND: [
-          {
+      if (!isSessionActive) {
+        await prismaClient.chatSession.create({
+          data: {
+            userId: findChatbot.authorEmail,
             chatbotId: findChatbot.id,
-          },
-          {
             isFiled: false,
+            slug: chatbotId,
+            isChatWidget: false,
           },
-        ],
-      },
-      select: {
-        id: true,
-      },
-    });
+        });
+      }
 
-    if (!isSessionActive) {
-      await prismaClient.chatSession.create({
+      const getSessionCreated = await prismaClient.chatSession.findFirst({
+        where: {
+          AND: [
+            {
+              chatbotId: findChatbot.id,
+            },
+            {
+              isFiled: false,
+            },
+          ],
+        },
+        select: {
+          id: true,
+        },
+      });
+
+      const chat_session_id = getSessionCreated.id;
+
+      await prismaClient.chatbotMessages.create({
         data: {
-          userId: findChatbot.authorEmail,
-          chatbotId: findChatbot.id,
-          isFiled: false,
-          slug: chatbotId,
+          chatSessionId: chat_session_id,
+          sender: author,
+          bot: bot,
+          messages: [author, bot],
           isChatWidget: false,
+          isFiled: false,
         },
       });
     }
-
-    const getSessionCreated = await prismaClient.chatSession.findFirst({
-      where: {
-        AND: [
-          {
-            chatbotId: findChatbot.id,
-          },
-          {
-            isFiled: false,
-          },
-        ],
-      },
-      select: {
-        id: true,
-      },
-    });
-
-    const chat_session_id = getSessionCreated.id;
-
-    await prismaClient.chatbotMessages.create({
-      data: {
-        chatSessionId: chat_session_id,
-        sender: author,
-        bot: bot,
-        messages: [author, bot],
-        isFiled: false,
-      },
-    });
-
+    
     return { ok: true };
   }
 }
