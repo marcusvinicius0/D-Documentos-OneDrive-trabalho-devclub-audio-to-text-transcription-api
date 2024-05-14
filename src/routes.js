@@ -21,6 +21,7 @@ import { UpdateChatbotWithTextController } from "./controllers/chatbase/chatbot/
 import { DeleteChatbotController } from "./controllers/chatbase/chatbot/DeleteChatbotController.js";
 import { SaveNewAssistantController } from "./controllers/chatbase/chatbot/SaveNewAssistantController.js";
 import { SaveNewAssistantForRetrainingController } from "./controllers/chatbase/chatbot/SaveNewAssistantForRetrainingController.js";
+import { GetChatHistoryOfEmbedController } from "./controllers/chatbase/chat-ui/GetChatHistoryOfEmbedController.js";
 
 const routes = new Router();
 const multer_config = multer();
@@ -60,6 +61,7 @@ routes.post("/chatbot/chat-session/:id", new ChatSessionFlowController().store);
 routes.post("/chatbot/save-chatflow/:id", new SaveChatFlowController().store);
 routes.get("/chatbot/chat-history/:id", new GetChatHistoryController().index);
 routes.delete("/chatbot/chat-history/:id", new DeleteChatHistoryController().delete);
+routes.get("/chatbot/chat-history/embed/:id", new GetChatHistoryOfEmbedController().index);
 
 routes.post("/chatbot/wppconnection/:id", new StartNewConnectSessionController().store);
 

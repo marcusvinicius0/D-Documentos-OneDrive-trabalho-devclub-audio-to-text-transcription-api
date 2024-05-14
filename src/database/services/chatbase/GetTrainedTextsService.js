@@ -17,13 +17,53 @@ class GetTrainedTextsService {
           },
         ],
       },
+      select: {
+        id: true,
+        text: true,
+        author: true,
+        isTextTrained: true,
+        textLength: true,
+        chatbotId: true,
+        slug: true,
+        createdAt: true,
+        updatedAt: true,
+      }
     });
 
     if (!isTrainedTexts) {
       throw new AppError("Nenhum texto treinado foi encontrado.", 404)
     }
 
-    return isTrainedTexts || [];
+    const getUserChatbot = await prismaClient.chatbot.findFirst({
+      where: {
+        id: chatbotId,
+      },
+      select: {
+        id: true,
+        instructions: true,
+        temperature: true,
+      }
+    });
+
+    const trainedTexts = isTrainedTexts.map((text) => {
+      const result = [{
+        id: text.id,
+        text: text.text,
+        author: text.author,
+        isTextTrained: text.isTextTrained,
+        textLength: text.textLength,
+        chatbotId: text.chatbotId,
+        slug: text.slug,
+        chatbotInstructions: getUserChatbot.instructions,
+        chatbotTemperature: getUserChatbot.temperature,
+        createdAt: text.createdAt,
+        updatedAt: text.updatedAt,
+      }]
+
+      return result;
+    })
+
+    return trainedTexts || [];
   }
 }
 

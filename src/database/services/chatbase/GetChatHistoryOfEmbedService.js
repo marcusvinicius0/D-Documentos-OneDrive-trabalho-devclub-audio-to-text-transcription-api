@@ -1,35 +1,36 @@
 import prismaClient from "../../../prisma/connect.js";
 
-class GetChatHistoryService {
-  async execute({ chatbotIdentification }) {
-    const findUserChatSession = await prismaClient.chatSession.findFirst({
+class GetChatHistoryOfEmbedService {
+  async execute({ chatbotId }) {
+
+    const findUserChatSessionWidget = await prismaClient.chatSession.findFirst({
       where: {
         AND: [
           {
-            chatbotId: chatbotIdentification,
+            chatbotId: chatbotId,
           },
           {
-            isChatWidget: false,
-          }
-        ]
+            isChatWidget: true,
+          },
+        ],
       },
       select: {
         id: true,
       },
     });
 
-    if (!findUserChatSession) {
+    if (!findUserChatSessionWidget) {
       return [];
     }
 
-    const session_id = findUserChatSession.id;
+    const sessionId = findUserChatSessionWidget.id;
 
     const getChatFlow = await prismaClient.chatbotMessages.findMany({
       orderBy: {
         createdAt: "asc",
       },
       where: {
-        chatSessionId: session_id,
+        chatSessionId: sessionId,
       },
       select: {
         id: true,
@@ -45,8 +46,8 @@ class GetChatHistoryService {
 
     const allMessages = [].concat(...getChatFlow.map(chat => chat.messages));
 
-    return allMessages;
+    return allMessages || [];
   }
 }
 
-export { GetChatHistoryService };
+export { GetChatHistoryOfEmbedService };

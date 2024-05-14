@@ -106,6 +106,7 @@ model ChatSession {
   Chatbot         Chatbot           @relation(fields: [chatbotId], references: [id])
   ChatbotMessages ChatbotMessages[]
   slug            String            @default("")
+  isChatWidget    Boolean           @default(false)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
