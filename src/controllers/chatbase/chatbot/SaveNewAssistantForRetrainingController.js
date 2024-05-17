@@ -4,10 +4,11 @@ class SaveNewAssistantForRetrainingController {
   async store(req, res, next) {
     try {
       const chatbotId = req.params.id;
+      const { botConfig } = req.body;
 
-      const createRunAssistantForRetraining = await runAssistantForRetraining(chatbotId);
+      const createRunAssistantForRetraining = await runAssistantForRetraining(chatbotId, botConfig);
 
-      return res.status(200).json(createRunAssistantForRetraining);
+      return res.status(201).json(createRunAssistantForRetraining);
     } catch (error) {
       next(error);
     }

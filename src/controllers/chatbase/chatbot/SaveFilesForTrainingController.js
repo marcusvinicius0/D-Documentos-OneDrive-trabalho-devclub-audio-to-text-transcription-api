@@ -9,36 +9,33 @@ class SaveFilesForTrainingController {
       const files = req.files;
       const chatbotId = req.params.id;
 
-      if (files) {
-        await speechToTextEdenAI(files)
-          .then(async (transcriptions) => {
-            const texts = transcriptions.map((transcription) => {
-              const result = transcription;
-              return result;
-            });
-
-            const joinAllTexts = texts.map((transcription) => {
-              const text = transcription.transcription.results.openai.text;
-
-              return text;
-            });
-
-            fs.writeFileSync("./src/utils/chatbot-content.txt", JSON.stringify(joinAllTexts, null, 2), { encoding: "utf-8" });
-
-            createSaveFilesForTrainingService;
-            const service = await createSaveFilesForTrainingService.execute({
-              texts,
-              chatbotId,
-            });
-            
-            return res.status(200).json(service);
-          })
-          .catch((error) => {
-            console.error("Erro ao processar transcrições: ", error);
-          });
-      } else {
-        next();
+      if (!files) {
+        return res.status(400).json({ error: "Nenhum arquivo foi baixado." });
       }
+
+      const transcriptions = await speechToTextEdenAI(files);
+      let texts = transcriptions.filter(Boolean);
+
+      const joinTexts = texts
+        .map((transcription) => {
+          let result = transcription.transcription.results.openai.text;
+          return result;
+        })
+        .filter(Boolean);
+
+      fs.writeFileSync(
+        "./src/utils/chatbot-content.txt",
+        JSON.stringify(joinTexts, null, 2),
+        { encoding: "utf-8" }
+      );
+
+      createSaveFilesForTrainingService;
+      const service = await createSaveFilesForTrainingService.execute({
+        texts,
+        chatbotId,
+      });
+
+      return res.status(201).json(service);
     } catch (error) {
       next(error);
     }

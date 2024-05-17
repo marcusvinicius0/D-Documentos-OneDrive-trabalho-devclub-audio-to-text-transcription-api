@@ -11,37 +11,42 @@ class SaveNewFilesForRetrainingService {
         id: true,
         authorEmail: true,
         slug: true,
-      }
+      },
     });
 
     if (!isChatbot) {
-      throw new AppError("Você não tem permissão para rodar esse serviço.", 401);
+      throw new AppError(
+        "Você não tem permissão para rodar esse serviço.",
+        401
+      );
     }
 
-    const createPromises = texts.flatMap((transcription) => {
+    const transcriptions = Array.isArray(texts) ? texts : [texts];
+
+    const filesToInsert = transcriptions.map((transcription) => {
       const filename = transcription.filename;
       const text = transcription.transcription.results.openai.text;
       const message_length = text.length;
 
-      return prismaClient.filesForBotTraining.create({
-        data: {
-          author: isChatbot.authorEmail,
-          chatbotId: isChatbot.id,
-          message: text,
-          fileName: filename,
-          isFileTrained: true,
-          messageLength: message_length,
-          slug: isChatbot.slug,
-        }
-      })
-    })
+      return {
+        author: isChatbot.authorEmail,
+        chatbotId: isChatbot.id,
+        message: text,
+        fileName: filename,
+        isFileTrained: true,
+        messageLength: message_length,
+        slug: isChatbot.slug,
+      };
+    });
 
     try {
-      await prismaClient.$transaction(createPromises);
-
-      return { message: "Transcrições salvas com sucesso" };
+      await prismaClient.filesForBotTraining.createMany({
+        data: filesToInsert,
+      })
+      return { message: "Transcrições salvas com sucesso." };
     } catch (error) {
       console.error(error);
+      throw new AppError("Erro ao salvar transcrições no banco de dados.", 500);
     }
   }
 }

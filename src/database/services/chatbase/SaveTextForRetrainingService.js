@@ -17,7 +17,7 @@ class SaveTextsForRetrainingService {
       throw new AppError("Você não tem permissão para rodar esse serviço.", 401);
     }
     
-    let textLength = textData.length;
+    let textLength = textData?.length;
 
     const saveText = await prismaClient.textsForBotTraining.create({
       data: {

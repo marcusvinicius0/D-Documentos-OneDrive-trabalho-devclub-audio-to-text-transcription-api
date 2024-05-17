@@ -12,7 +12,6 @@ class UpdateChatbotWithTextController {
       })
 
       return res.status(200).json(service);
-
     } catch (error) {
       next(error);
     }

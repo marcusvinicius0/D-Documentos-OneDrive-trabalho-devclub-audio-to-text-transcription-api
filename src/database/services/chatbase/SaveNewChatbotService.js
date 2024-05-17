@@ -3,13 +3,6 @@ import prismaClient from "../../../prisma/connect.js";
 
 class SaveNewChatbotService {
   async execute(chatbot) {
-    if (!chatbot.authorEmail || !chatbot.authorName) {
-      throw new AppError(
-        "Você não tem permissão para rodar esse serviço.",
-        401
-      );
-    }
-
     const chatbotDataStructure = {
       model: "gpt-3.5-turbo",
       authorEmail: chatbot.authorEmail,

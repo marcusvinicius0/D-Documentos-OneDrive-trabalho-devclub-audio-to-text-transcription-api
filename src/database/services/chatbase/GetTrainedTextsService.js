@@ -5,7 +5,7 @@ class GetTrainedTextsService {
   async execute({ chatbotId }) {
     const isTrainedTexts = await prismaClient.textsForBotTraining.findMany({
       orderBy: {
-        createdAt: 'desc',
+        createdAt: "desc",
       },
       where: {
         AND: [
@@ -27,11 +27,11 @@ class GetTrainedTextsService {
         slug: true,
         createdAt: true,
         updatedAt: true,
-      }
+      },
     });
 
     if (!isTrainedTexts) {
-      throw new AppError("Nenhum texto treinado foi encontrado.", 404)
+      throw new AppError("Nenhum texto treinado foi encontrado.", 404);
     }
 
     const getUserChatbot = await prismaClient.chatbot.findFirst({
@@ -42,11 +42,11 @@ class GetTrainedTextsService {
         id: true,
         instructions: true,
         temperature: true,
-      }
+      },
     });
 
     const trainedTexts = isTrainedTexts.map((text) => {
-      const result = [{
+      const result = {
         id: text.id,
         text: text.text,
         author: text.author,
@@ -58,10 +58,10 @@ class GetTrainedTextsService {
         chatbotTemperature: getUserChatbot.temperature,
         createdAt: text.createdAt,
         updatedAt: text.updatedAt,
-      }]
+      };
 
       return result;
-    })
+    });
 
     return trainedTexts || [];
   }

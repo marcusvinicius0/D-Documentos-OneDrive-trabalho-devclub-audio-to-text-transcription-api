@@ -170,7 +170,7 @@ export async function startChatWithAssistant({ currentMessage, chatbotId }) {
   return cleanedText;
 }
 
-export async function runAssistantForRetraining(chatId) {
+export async function runAssistantForRetraining(chatId, botConfig) {
   try {
     const findChatbot = await prismaClient.chatbot.findFirst({
       where: {
@@ -193,12 +193,13 @@ export async function runAssistantForRetraining(chatId) {
     if (!findChatbot) {
       throw new AppError("Não foi possível encontrar o chatbot.", 404);
     }
+
     const assistantConfigForRetrain = {
       name: findChatbot.name,
-      instructions: findChatbot.instructions,
+      instructions: botConfig.instructions,
       tools: [{ type: "retrieval" }],
       model: "gpt-3.5-turbo",
-      temperature: findChatbot.temperature,
+      temperature: botConfig.temperature,
     };
 
     const assistant = await openai.beta.assistants.create(
@@ -217,6 +218,8 @@ export async function runAssistantForRetraining(chatId) {
       },
       data: {
         assistantId: assistant.id,
+        instructions: botConfig.instructions,
+        temperature: botConfig.temperature,
         lastTrainedAt: new Date(),
       },
     });
